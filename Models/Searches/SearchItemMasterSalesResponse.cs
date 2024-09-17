@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace bom.Models.BoughtOutItems
+﻿namespace bom.Models.Searches
 {
-    public class BoughtOutItem : IEntity
+    public class SearchItemMasterSalesResponse
     {
         public int Id { get; set; }
         public string ItemName { get; set; }
@@ -15,6 +9,8 @@ namespace bom.Models.BoughtOutItems
         public string UOM { get; set; }
         public int Quantity { get; set; }
         public int Level { get; set; }
-        public decimal CostPerUnit { get; set; }
+        public string PType { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
+
 }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bom.Models.BOMStructure
+namespace bom.Models.BOMStructures
 {
     public class BOMStructure : IEntity
     {

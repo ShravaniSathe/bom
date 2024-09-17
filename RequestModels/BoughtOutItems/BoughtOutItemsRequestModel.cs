@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace bom.Models.BoughtOutItems
+﻿namespace bom.API.RequestModels.BoughtOutItems
 {
-    public class BoughtOutItem : IEntity
+    public class BoughtOutItemsRequestModel
     {
         public int Id { get; set; }
         public string ItemName { get; set; }

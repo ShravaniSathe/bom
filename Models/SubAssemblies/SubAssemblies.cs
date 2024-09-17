@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace bom.Models.SubAssemblies
 {
-    public class SubAssemblies : IEntity
+    public class SubAssemblie : IEntity
     {
         public int Id { get; set; }
         public string ItemName { get; set; }
