@@ -107,11 +107,12 @@ namespace bom.API.Controllers
             return new ItemRawMaterialMapping
             {
                 Id = requestModel.Id,
-                ItemMasterSalesId = new ItemMasterSale { Id = requestModel.ItemMasterSalesId }, // Assuming your ItemMasterSale has an Id property
-                ItemMasterRawMaterialId = new ItemMasterRawMaterial { Id = requestModel.ItemMasterRawMaterialId }, // Assuming your ItemMasterRawMaterial has an Id property
+                ItemMasterSalesId = requestModel.ItemMasterSalesId, // Assign the int directly
+                ItemMasterRawMaterialId = requestModel.ItemMasterRawMaterialId, // Assign the int directly
                 Quantity = requestModel.Quantity,
                 ProcureType = requestModel.ProcureType
             };
         }
+
     }
 }

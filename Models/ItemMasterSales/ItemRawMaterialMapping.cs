@@ -10,9 +10,11 @@ namespace bom.Models.ItemMasterSales
     public class ItemRawMaterialMapping : IEntity
     {
         public int Id { get; set; }
-        public ItemMasterSale ItemMasterSalesId { get; set; }
-        public ItemMasterRawMaterial ItemMasterRawMaterialId { get; set; }
+        public int ItemMasterSalesId { get; set; }
+        public int ItemMasterRawMaterialId { get; set; }
         public decimal Quantity { get; set; }
         public string ProcureType { get; set; }
+        public ItemMasterSale ItemMasterSale { get; set; }
+        public ItemMasterRawMaterial  ItemMasterRawMaterial { get; set; }
     }
 }

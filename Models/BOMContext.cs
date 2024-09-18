@@ -15,7 +15,6 @@ namespace bom.Models
     public class BOMContext : DbContext
     {
         public BOMContext(DbContextOptions<BOMContext> options) : base(options) { }
-
         public DbSet<ItemMasterSale> ItemMasterSales { get; set; }
         public DbSet<ItemMasterRawMaterial> ItemMasterRawMaterial { get; set; }
         public DbSet<SubAssemblie> SubAssemblies { get; set; }

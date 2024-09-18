@@ -11,8 +11,10 @@ namespace bom.Models.BOMStructures
     public class BOMStructure : IEntity
     {
         public int Id { get; set; }
-        public ItemMasterSale ItemMasterSalesId { get; set; }
-        public ItemMasterRawMaterial ParentRawMaterialId { get; set; }
-        public ItemMasterRawMaterial ChildRawMaterialId { get; set; }
+        public int ItemMasterSalesId { get; set; }
+        public int ParentRawMaterialId { get; set; }
+        public int ChildRawMaterialId { get; set; }
+        public ItemMasterRawMaterial ItemMasterRawMaterial { get; set; }
+        public ItemMasterSale ItemMasterSale { get; set; }
     }
 }

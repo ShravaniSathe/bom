@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 namespace bom.Models.BoughtOutItems
 {
-    public class BoughtOutItemMapping
+    public class BoughtOutItemMapping : IEntity
     {
+        public int Id { get; set; }
         public int BoughtOutItemId { get; set; }
         public int ItemId { get; set; }
         public decimal Quantity { get; set; }

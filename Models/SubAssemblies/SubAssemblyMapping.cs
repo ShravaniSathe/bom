@@ -9,8 +9,9 @@ using bom.Models.SubAssemblies;
 
 namespace bom.Models.SubAssemblies
 {
-    public class SubAssemblyMapping
+    public class SubAssemblyMapping : IEntity
     {
+        public int Id { get; set; }
         public int SubAssemblyId { get; set; }
         public int ItemId { get; set; }
         public int? RawMaterialId { get; set; } 
