@@ -103,16 +103,16 @@ namespace bom.Repositories.BOMStructures.Implementations
 
 
 
-        public async Task UpdateBOMTreeAsync(BOMTree bomTree)
+        public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
         {
             const string storedProcedureName = "sp_UpdateBOMTree";
 
             await db.ExecuteAsync(storedProcedureName, new
             {
-                BOMId = bomTree.BOMId,
-                BOMName = bomTree.BOMName
+                Id = bomTree.BOMId,
+                NewBOMName = bomTree.BOMName
             }, commandType: CommandType.StoredProcedure);
-
+            return bomTree;
             // Update BOM Tree Nodes
             // (Additional implementation if needed)
         }

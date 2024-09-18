@@ -98,22 +98,22 @@ namespace bom.Repositories.RawMaterialBoughtOutMappings.Implementations
             }
         }
 
-        public async Task<bool> UpdateRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping)
+        public async Task<RawMaterialBoughtOutMapping> UpdateRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping)
         {
             const string storedProcedureName = "dbo.UpdateRawMaterialBoughtOutMapping";
 
             var result = await db.ExecuteAsync(storedProcedureName,
                                                new
                                                {
-                                                   Id = mapping.Id,
-                                                   ItemMasterRawMaterialId = mapping.ItemMasterRawMaterialId,
-                                                   BoughtOutId = mapping.BoughtOutId,
-                                                   CostPerUnit = mapping.CostPerUnit
+                                                   RawMaterialBoughtOutId = mapping.Id,
+                                                   NewItemMasterRawMaterialId = mapping.ItemMasterRawMaterialId,
+                                                   NewBoughtOutId = mapping.BoughtOutId,
+                                                   NewCostPerUnit = mapping.CostPerUnit
                                                },
                                                commandType: CommandType.StoredProcedure
                                                ).ConfigureAwait(false);
 
-            return result > 0;
+            return mapping;
         }
 
         private async Task<RawMaterialBoughtOutMapping> GetRawMaterialBoughtOutMappingObjectFromResult(dynamic rawMappingObject)

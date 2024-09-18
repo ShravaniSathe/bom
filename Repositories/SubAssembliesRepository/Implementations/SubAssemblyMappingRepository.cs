@@ -100,22 +100,22 @@ namespace bom.Repositories.SubAssemblies.Implementations
             }
         }
 
-        public async Task<bool> UpdateSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping)
+        public async Task<SubAssemblyMapping> UpdateSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping)
         {
             const string storedProcedureName = "dbo.UpdateSubAssemblyMapping";
 
             var result = await db.ExecuteAsync(storedProcedureName,
                                                new
                                                {
-                                                   SubAssemblyId = subAssemblyMapping.SubAssemblyId,
-                                                   ItemId = subAssemblyMapping.ItemId,
-                                                   RawMaterialId = subAssemblyMapping.RawMaterialId,
-                                                   Quantity = subAssemblyMapping.Quantity
+                                                   Id = subAssemblyMapping.SubAssemblyId,
+                                                   NewItemId = subAssemblyMapping.ItemId,
+                                                   NewRawMaterialId = subAssemblyMapping.RawMaterialId,
+                                                   NewQuantity = subAssemblyMapping.Quantity
                                                },
                                                commandType: CommandType.StoredProcedure
                                                ).ConfigureAwait(false);
 
-            return result > 0;
+            return subAssemblyMapping;
         }
 
         private async Task<SubAssemblyMapping> GetSubAssemblyMappingObjectFromResult(dynamic rawSubAssemblyMappingObject)

@@ -9,7 +9,7 @@ namespace bom.Managers.ItemMasterRawMaterials.Abstractions
         Task<RawMaterialBoughtOutMapping> AddRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping);
         Task<RawMaterialBoughtOutMapping> GetRawMaterialBoughtOutMappingAsync(int id);
         Task<List<RawMaterialBoughtOutMapping>> GetAllRawMaterialBoughtOutMappingsAsync();
-        Task<bool> UpdateRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping);
+        Task<RawMaterialBoughtOutMapping> UpdateRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping);
         Task DeleteRawMaterialBoughtOutMappingAsync(int id);
     }
 }

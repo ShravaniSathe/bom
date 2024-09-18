@@ -110,16 +110,16 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
             await db.QueryAsync(storedProcedureName,
                                 new
                                 {
-                                    Id = itemMasterRawMaterial.Id,
-                                    ItemMasterSaleId = itemMasterRawMaterial.ItemMasterSaleId,
-                                    ItemName = itemMasterRawMaterial.ItemName,
-                                    ItemCode = itemMasterRawMaterial.ItemCode,
-                                    Grade = itemMasterRawMaterial.Grade,
-                                    UOM = itemMasterRawMaterial.UOM,
-                                    Quantity = itemMasterRawMaterial.Quantity,
-                                    Level = itemMasterRawMaterial.Level,
-                                    PType = itemMasterRawMaterial.PType,
-                                    CostPerUnit = itemMasterRawMaterial.CostPerUnit
+                                    ItemMasterRawMaterialId = itemMasterRawMaterial.Id,
+                                    NewItemMasterSaleId = itemMasterRawMaterial.ItemMasterSaleId,
+                                    NewItemName = itemMasterRawMaterial.ItemName,
+                                    NewItemCode = itemMasterRawMaterial.ItemCode,
+                                    NewGrade = itemMasterRawMaterial.Grade,
+                                    NewUOM = itemMasterRawMaterial.UOM,
+                                    NewQuantity = itemMasterRawMaterial.Quantity,
+                                    NewLevel = itemMasterRawMaterial.Level,
+                                    NewPType = itemMasterRawMaterial.PType,
+                                    NewCostPerUnit = itemMasterRawMaterial.CostPerUnit
                                 },
                                 commandType: CommandType.StoredProcedure
                                 ).ConfigureAwait(false);

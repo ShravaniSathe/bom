@@ -9,7 +9,7 @@ namespace bom.Managers.SubAssemblies.Abstractions
         Task<SubAssemblyMapping> AddSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping);
         Task<SubAssemblyMapping> GetSubAssemblyMappingAsync(int id);
         Task<List<SubAssemblyMapping>> GetAllSubAssemblyMappingsAsync();
-        Task<bool> UpdateSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping);
+        Task<SubAssemblyMapping> UpdateSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping);
         Task DeleteSubAssemblyMappingAsync(int id);
     }
 }

@@ -10,6 +10,6 @@ namespace bom.Repositories.SubAssemblies.Abstractions
         Task<bool> DeleteSubAssemblyMappingAsync(int id);
         Task<List<SubAssemblyMapping>> GetAllSubAssemblyMappingsAsync();
         Task<SubAssemblyMapping> GetSubAssemblyMappingAsync(int id);
-        Task<bool> UpdateSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping);
+        Task<SubAssemblyMapping> UpdateSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping);
     }
 }

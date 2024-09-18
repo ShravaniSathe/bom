@@ -115,7 +115,7 @@ namespace bom.Repositories.ItemMasterSales.Implementations
             await db.QueryAsync(storedProcedureName,
                                 new
                                 {
-                                    ItemId = itemMasterSale.Id,
+                                    ItemMasterSaleId = itemMasterSale.Id,
                                     NewItemName = itemMasterSale.ItemName,
                                     NewItemCode = itemMasterSale.ItemCode,
                                     NewGrade = itemMasterSale.Grade,

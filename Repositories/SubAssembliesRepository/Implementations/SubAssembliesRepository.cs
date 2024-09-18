@@ -98,22 +98,22 @@ namespace bom.Repositories.SubAssemblies.Implementations
             }
         }
 
-        public async Task<bool> UpdateSubAssemblyAsync(SubAssemblie subAssembly)
+        public async Task<SubAssemblie> UpdateSubAssemblyAsync(SubAssemblie subAssembly)
         {
             const string storedProcedureName = "dbo.UpdateSubAssembly";
 
             var result = await db.ExecuteAsync(storedProcedureName,
                                                new
                                                {
-                                                   Id = subAssembly.Id,
-                                                   ItemName = subAssembly.ItemName,
-                                                   UOM = subAssembly.UOM,
-                                                   CostPerUnit = subAssembly.CostPerUnit
+                                                   SubAssemblyId = subAssembly.Id,
+                                                   NewItemName = subAssembly.ItemName,
+                                                   NewUOM = subAssembly.UOM,
+                                                   NewCostPerUnit = subAssembly.CostPerUnit
                                                },
                                                commandType: CommandType.StoredProcedure
                                                ).ConfigureAwait(false);
 
-            return result > 0;
+            return subAssembly;
         }
 
         private async Task<SubAssemblie> GetSubAssemblieObjectFromResult(dynamic rawSubAssemblieObject)

@@ -30,7 +30,7 @@ namespace bom.Managers.BOMStructures.Implementations
             return await _bomStructuresRepository.GetAllBOMStructuresAsync();
         }
 
-        public async Task<bool> UpdateBOMStructureAsync(BOMStructure bomStructure)
+        public async Task<BOMStructure> UpdateBOMStructureAsync(BOMStructure bomStructure)
         {
             return await _bomStructuresRepository.UpdateBOMStructureAsync(bomStructure);
         }

@@ -41,7 +41,7 @@ namespace bom.Managers.SubAssemblies.Implementations
             return await _subAssemblyMappingRepository.GetSubAssemblyMappingAsync(id);
         }
 
-        public async Task<bool> UpdateSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping)
+        public async Task<SubAssemblyMapping> UpdateSubAssemblyMappingAsync(SubAssemblyMapping subAssemblyMapping)
         {
             return await _subAssemblyMappingRepository.UpdateSubAssemblyMappingAsync(subAssemblyMapping);
         }

@@ -11,6 +11,6 @@ namespace bom.Repositories.SubAssemblies.Abstractions
         Task<bool> DeleteSubAssemblyAsync(int id);
         Task<List<SubAssemblie>> GetAllSubAssembliesAsync();
         Task<SubAssemblie> GetSubAssemblyAsync(int id);
-        Task<bool> UpdateSubAssemblyAsync(SubAssemblie subAssembly);
+        Task<SubAssemblie> UpdateSubAssemblyAsync(SubAssemblie subAssembly);
     }
 }

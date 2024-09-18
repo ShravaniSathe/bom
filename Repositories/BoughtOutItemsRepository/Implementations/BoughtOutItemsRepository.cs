@@ -71,26 +71,26 @@ namespace bom.Repositories.BoughtOutItems.Implementations
             return result;
         }
 
-        public async Task<bool> UpdateBoughtOutItemAsync(BoughtOutItem boughtOutItem)
+        public async Task<BoughtOutItem> UpdateBoughtOutItemAsync(BoughtOutItem boughtOutItem)
         {
             const string storedProcedureName = "dbo.UpdateBoughtOutItem";
 
             var result = await db.ExecuteAsync(storedProcedureName,
                                                new
                                                {
-                                                   boughtOutItem.Id,
-                                                   boughtOutItem.ItemName,
-                                                   boughtOutItem.ItemCode,
-                                                   boughtOutItem.Grade,
-                                                   boughtOutItem.UOM,
-                                                   boughtOutItem.Quantity,
-                                                   boughtOutItem.Level,
-                                                   boughtOutItem.CostPerUnit
+                                                   BoughtOutItemId = boughtOutItem.Id,
+                                                   NewItemId = boughtOutItem.ItemName,
+                                                   NewItemCode = boughtOutItem.ItemCode,
+                                                   NewGrade = boughtOutItem.Grade,
+                                                   NewUOM = boughtOutItem.UOM,
+                                                   NewQuantity = boughtOutItem.Quantity,
+                                                   NewLevel = boughtOutItem.Level,
+                                                   NewCostPerUnit = boughtOutItem.CostPerUnit
                                                },
                                                commandType: CommandType.StoredProcedure
                                                ).ConfigureAwait(false);
 
-            return result > 0;
+            return boughtOutItem;
         }
 
         public async Task DeleteBoughtOutItemAsync(int id)

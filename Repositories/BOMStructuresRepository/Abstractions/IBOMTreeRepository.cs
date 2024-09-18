@@ -8,7 +8,7 @@ namespace bom.Repositories.BOMStructures.Abstractions
     {
         Task<BOMTree> CreateBOMTreeAsync(BOMTree bomTree);
         Task<BOMTree> GetBOMTreeByIdAsync(int bomId);
-        Task UpdateBOMTreeAsync(BOMTree bomTree);
+        Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree);
         Task DeleteBOMTreeAsync(int bomId);
     }
 }

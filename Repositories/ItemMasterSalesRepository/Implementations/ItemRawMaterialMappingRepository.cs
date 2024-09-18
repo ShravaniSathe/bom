@@ -106,7 +106,7 @@ namespace bom.Repositories.ItemRawMaterialMappings.Implementations
             await db.QueryAsync(storedProcedureName,
                                 new
                                 {
-                                    Id = itemRawMaterialMapping.Id,
+                                    ItemRawMaterialId = itemRawMaterialMapping.Id,
                                     NewItemMasterSalesId = itemRawMaterialMapping.ItemMasterSalesId,
                                     NewItemMasterRawMaterialId = itemRawMaterialMapping.ItemMasterRawMaterialId,
                                     NewQuantity = itemRawMaterialMapping.Quantity

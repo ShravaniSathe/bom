@@ -9,7 +9,7 @@ namespace bom.Repositories.BoughtOutItems.Abstractions
         Task<BoughtOutItem> AddBoughtOutItemAsync(BoughtOutItem boughtOutItem);
         Task<BoughtOutItem> GetBoughtOutItemAsync(int id);
         Task<IEnumerable<BoughtOutItem>> GetAllBoughtOutItemsAsync();
-        Task<bool> UpdateBoughtOutItemAsync(BoughtOutItem boughtOutItem);
+        Task<BoughtOutItem> UpdateBoughtOutItemAsync(BoughtOutItem boughtOutItem);
         Task DeleteBoughtOutItemAsync(int id);
     }
 }

@@ -9,7 +9,7 @@ namespace bom.Managers.SubAssemblies.Abstractions
         Task<SubAssemblie> AddSubAssemblyAsync(SubAssemblie subAssembly);
         Task<SubAssemblie> GetSubAssemblyAsync(int id);
         Task<List<SubAssemblie>> GetAllSubAssembliesAsync();
-        Task<bool> UpdateSubAssemblyAsync(SubAssemblie subAssembly);
+        Task<SubAssemblie> UpdateSubAssemblyAsync(SubAssemblie subAssembly);
         Task DeleteSubAssemblyAsync(int id);
     }
 }

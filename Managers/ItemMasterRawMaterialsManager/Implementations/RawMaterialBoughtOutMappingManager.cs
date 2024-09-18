@@ -42,7 +42,7 @@ namespace bom.Managers.ItemMasterRawMaterials.Implementations
             return await _repo.GetRawMaterialBoughtOutMappingAsync(id);
         }
 
-        public async Task<bool> UpdateRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping)
+        public async Task<RawMaterialBoughtOutMapping> UpdateRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping)
         {
             return await _repo.UpdateRawMaterialBoughtOutMappingAsync(mapping);
         }

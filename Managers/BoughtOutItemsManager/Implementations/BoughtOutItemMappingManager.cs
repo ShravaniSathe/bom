@@ -36,7 +36,7 @@ namespace bom.Managers.BoughtOutItems
             return await _boughtOutItemMappingRepository.GetAllBoughtOutItemMappingsAsync();
         }
 
-        public async Task<bool> UpdateBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
+        public async Task<BoughtOutItemMapping> UpdateBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
         {
             return await _boughtOutItemMappingRepository.UpdateBoughtOutItemMappingAsync(boughtOutItemMapping);
         }

@@ -30,7 +30,7 @@ namespace bom.Managers.BoughtOutItems.Implementations
             return await _boughtOutItemsRepository.GetAllBoughtOutItemsAsync();
         }
 
-        public async Task<bool> UpdateBoughtOutItemAsync(BoughtOutItem boughtOutItem)
+        public async Task<BoughtOutItem> UpdateBoughtOutItemAsync(BoughtOutItem boughtOutItem)
         {
             return await _boughtOutItemsRepository.UpdateBoughtOutItemAsync(boughtOutItem);
         }

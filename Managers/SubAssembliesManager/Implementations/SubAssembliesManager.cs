@@ -35,7 +35,7 @@ namespace bom.Managers.SubAssemblies.Implementations
             return await _subAssembliesRepository.GetSubAssemblyAsync(id);
         }
 
-        public async Task<bool> UpdateSubAssemblyAsync(SubAssemblie subAssembly)
+        public async Task<SubAssemblie> UpdateSubAssemblyAsync(SubAssemblie subAssembly)
         {
             return await _subAssembliesRepository.UpdateSubAssemblyAsync(subAssembly);
         }

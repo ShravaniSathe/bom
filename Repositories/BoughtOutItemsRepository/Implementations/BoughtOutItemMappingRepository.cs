@@ -67,21 +67,21 @@ namespace bom.Repositories.BoughtOutItems.Implementations
             return result;
         }
 
-        public async Task<bool> UpdateBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
+        public async Task<BoughtOutItemMapping> UpdateBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
         {
             const string storedProcedureName = "dbo.UpdateBoughtOutItemMapping";
 
             var result = await db.ExecuteAsync(storedProcedureName,
                                                new
                                                {
-                                                   boughtOutItemMapping.BoughtOutItemId,
-                                                   boughtOutItemMapping.ItemId,
-                                                   boughtOutItemMapping.Quantity
+                                                   Id = boughtOutItemMapping.BoughtOutItemId,
+                                                   NewItemId = boughtOutItemMapping.ItemId,
+                                                   NewQuantity = boughtOutItemMapping.Quantity
                                                },
                                                commandType: CommandType.StoredProcedure
                                                ).ConfigureAwait(false);
 
-            return result > 0;
+            return boughtOutItemMapping;
         }
 
         public async Task DeleteBoughtOutItemMappingAsync(int id)

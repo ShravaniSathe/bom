@@ -67,22 +67,22 @@ namespace bom.Repositories.BOMStructures.Implementations
             return result;
         }
 
-        public async Task<bool> UpdateBOMStructureAsync(BOMStructure bomStructure)
+        public async Task<BOMStructure> UpdateBOMStructureAsync(BOMStructure bomStructure)
         {
             const string storedProcedureName = "dbo.UpdateBOMStructure";
 
             var result = await db.ExecuteAsync(storedProcedureName,
                                                new
                                                {
-                                                   bomStructure.Id,
-                                                   bomStructure.ItemMasterSalesId,
-                                                   bomStructure.ParentRawMaterialId,
-                                                   bomStructure.ChildRawMaterialId
+                                                   BOMStructureId = bomStructure.Id,
+                                                   NewItemMasterSalesId = bomStructure.ItemMasterSalesId,
+                                                   NewParentRawMaterialId = bomStructure.ParentRawMaterialId,
+                                                   NewChildRawMaterialId = bomStructure.ChildRawMaterialId
                                                },
                                                commandType: CommandType.StoredProcedure
                                                ).ConfigureAwait(false);
 
-            return result > 0;
+            return bomStructure;
         }
 
         public async Task DeleteBOMStructureAsync(int id)
