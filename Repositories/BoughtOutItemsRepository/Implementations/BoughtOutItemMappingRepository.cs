@@ -10,11 +10,14 @@ namespace bom.Repositories.BoughtOutItems.Implementations
 {
     public class BoughtOutItemMappingRepository : Repository<BoughtOutItemMapping>, IBoughtOutItemMappingRepository
     {
-        public BoughtOutItemMappingRepository(string connectionString) : base(connectionString)
+        public BoughtOutItemMappingRepository(string connectionString) : 
+            base(connectionString)
         {
+
+
         }
 
-        public async Task<BoughtOutItemMapping> AddBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
+    public async Task<BoughtOutItemMapping> AddBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
         {
             using (var tran = BeginTransaction())
             {

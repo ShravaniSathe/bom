@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using bom.Models.ItemMasterRawMaterials;
 using bom.Managers.ItemRawMaterialMappings.Abstractions;
-using bom.Repositories.ItemRawMaterialMappings.Abstractions;
+using bom.Repositories.ItemMasterSales.Abstractions;
 using bom.Models.ItemMasterSales;
 
 namespace bom.Managers.ItemRawMaterialMappings.Implementations
@@ -10,17 +10,17 @@ namespace bom.Managers.ItemRawMaterialMappings.Implementations
     public class ItemRawMaterialMappingManager : IItemRawMaterialMappingManager
     {
         private readonly IItemRawMaterialMappingRepository _repo;
-        private string connectionString;
+       // private string connectionString;
 
         public ItemRawMaterialMappingManager(IItemRawMaterialMappingRepository repo)
         {
             _repo = repo;
         }
 
-        public ItemRawMaterialMappingManager(string connectionString)
-        {
-            this.connectionString = connectionString;
-        }
+       // public ItemRawMaterialMappingManager(string connectionString)
+       // {
+           // this.connectionString = connectionString;
+       // }
 
         public async Task<ItemRawMaterialMapping> AddItemRawMaterialMappingAsync(ItemRawMaterialMapping itemRawMaterialMapping)
         {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using bom.Models.ItemMasterRawMaterials;
 using bom.Models.ItemMasterSales;
 
-namespace bom.Repositories.ItemRawMaterialMappings.Abstractions
+namespace bom.Repositories.ItemMasterSales.Abstractions
 {
     public interface IItemRawMaterialMappingRepository : IRepository<ItemRawMaterialMapping>
     {
@@ -11,6 +11,6 @@ namespace bom.Repositories.ItemRawMaterialMappings.Abstractions
         Task<ItemRawMaterialMapping> GetItemRawMaterialMappingAsync(int id);
         Task<List<ItemRawMaterialMapping>> GetAllItemRawMaterialMappingsAsync();
         Task<ItemRawMaterialMapping> UpdateItemRawMaterialMappingAsync(ItemRawMaterialMapping itemRawMaterialMapping);
-        Task<bool> DeleteItemRawMaterialMappingAsync(int id);
+        Task<bool> DeleteItemRawMaterialMappingAsync(int id); 
     }
 }

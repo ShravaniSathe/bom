@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using bom.Models.ItemMasterRawMaterials;
 
-namespace bom.Repositories.RawMaterialBoughtOutMappings.Abstractions
+namespace bom.Repositories.ItemMasterRawMaterials.Abstractions
 {
     public interface IRawMaterialBoughtOutMappingRepository : IRepository<RawMaterialBoughtOutMapping>
     {

@@ -72,29 +72,29 @@ namespace bom.API.AppSetup
         {
             // ItemMasterSales
             services.AddScoped<IItemMasterSalesRepository>(x => new ItemMasterSalesRepository(connectionString));
-            services.AddScoped<IItemRawMaterialMappingManager>(x => new ItemRawMaterialMappingManager(connectionString));
+            services.AddScoped<IItemRawMaterialMappingRepository>(x => new ItemRawMaterialMappingRepository(connectionString)); // Corrected this to repository, not manager
 
             // ItemMasterRawMaterials
             services.AddScoped<IItemMasterRawMaterialsRepository>(x => new ItemMasterRawMaterialsRepository(connectionString));
-            services.AddScoped<IRawMaterialBoughtOutMappingManager>(x => new RawMaterialBoughtOutMappingManager(connectionString));
+            services.AddScoped<IRawMaterialBoughtOutMappingRepository>(x => new RawMaterialBoughtOutMappingRepository(connectionString)); // Corrected this to repository
 
             // SubAssemblies
             services.AddScoped<ISubAssembliesRepository>(x => new SubAssembliesRepository(connectionString));
-            services.AddScoped<ISubAssemblyMappingManager>(x => new SubAssemblyMappingManager(connectionString));
+            services.AddScoped<ISubAssemblyMappingRepository>(x => new SubAssemblyMappingRepository(connectionString)); // Corrected this to repository
 
             // BoughtOutItems
             services.AddScoped<IBoughtOutItemsRepository>(x => new BoughtOutItemsRepository(connectionString));
-            services.AddScoped<IBoughtOutItemMappingManager>(x => new BoughtOutItemMappingManager(connectionString));
+            services.AddScoped<IBoughtOutItemMappingRepository>(x => new BoughtOutItemMappingRepository(connectionString)); // Corrected this to repository
 
             // BOMStructures
             services.AddScoped<IBOMStructuresRepository>(x => new BOMStructuresRepository(connectionString));
-           
+
             // BOMTree
             services.AddScoped<IBOMTreeRepository>(x => new BOMTreeRepository(connectionString));
-            
 
             // Search
             services.AddScoped<ISearchRepository>(x => new SearchRepository(connectionString));
         }
+
     }
 }

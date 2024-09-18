@@ -4,16 +4,18 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using bom.Models.ItemMasterRawMaterials;
-using bom.Repositories.RawMaterialBoughtOutMappings.Abstractions;
+using bom.Repositories.ItemMasterRawMaterials.Abstractions;
 using Dapper;
 
-namespace bom.Repositories.RawMaterialBoughtOutMappings.Implementations
+namespace bom.Repositories.ItemMasterRawMaterials.Implementations
 {
     public class RawMaterialBoughtOutMappingRepository : Repository<RawMaterialBoughtOutMapping>, IRawMaterialBoughtOutMappingRepository
     {
         public RawMaterialBoughtOutMappingRepository(string connectionString) :
             base(connectionString)
         {
+
+
         }
 
         public async Task<RawMaterialBoughtOutMapping> AddRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping)

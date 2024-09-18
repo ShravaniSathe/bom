@@ -3,24 +3,23 @@ using System.Threading.Tasks;
 using bom.Models.ItemMasterRawMaterials;
 using bom.Managers.ItemMasterRawMaterials.Abstractions;
 using bom.Repositories.ItemMasterRawMaterials.Abstractions;
-using bom.Repositories.RawMaterialBoughtOutMappings.Abstractions;
 
 namespace bom.Managers.ItemMasterRawMaterials.Implementations
 {
     public class RawMaterialBoughtOutMappingManager : IRawMaterialBoughtOutMappingManager
     {
         private readonly IRawMaterialBoughtOutMappingRepository _repo;
-        private string connectionString;
+        //private string connectionString;
 
         public RawMaterialBoughtOutMappingManager(IRawMaterialBoughtOutMappingRepository repo)
         {
             _repo = repo;
         }
 
-        public RawMaterialBoughtOutMappingManager(string connectionString)
-        {
-            this.connectionString = connectionString;
-        }
+        //public RawMaterialBoughtOutMappingManager(string connectionString)
+        //{
+            //this.connectionString = connectionString;
+       // }
 
         public async Task<RawMaterialBoughtOutMapping> AddRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping)
         {
