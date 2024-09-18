@@ -87,7 +87,7 @@ namespace bom.API.Controllers
                 };
 
                 var result = await _boughtOutItemMappingManager.UpdateBoughtOutItemMappingAsync(mapping);
-                if (result)
+                if (result!=null)
                     return Ok("Update successful");
                 else
                     return NotFound("Mapping not found");

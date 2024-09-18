@@ -86,7 +86,7 @@ namespace bom.API.Controllers
                 };
 
                 var result = await _rawMaterialBoughtOutMappingManager.UpdateRawMaterialBoughtOutMappingAsync(mapping);
-                if (result)
+                if (result!= null)
                     return Ok("Update successful");
                 else
                     return NotFound("Mapping not found");
