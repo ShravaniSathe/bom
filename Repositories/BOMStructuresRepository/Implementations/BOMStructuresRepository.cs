@@ -30,7 +30,7 @@ namespace bom.Repositories.BOMStructures.Implementations
                         ChildRawMaterialId = bomStructure.ChildRawMaterialId
                     }, transaction: tran);
 
-                    bomStructure.BOMId = id.Single();
+                    bomStructure.Id = id.Single();
 
                     CommitTransaction(tran);
 
@@ -81,7 +81,7 @@ namespace bom.Repositories.BOMStructures.Implementations
             await db.ExecuteAsync(storedProcedureName,
                                   new
                                   {
-                                      Id = bomStructure.BOMId,
+                                      BOMId = bomStructure.Id,
                                       NewItemMasterSalesId = bomStructure.ItemMasterSalesId,
                                       NewParentRawMaterialId = bomStructure.ParentRawMaterialId,
                                       NewChildRawMaterialId = bomStructure.ChildRawMaterialId
@@ -107,7 +107,7 @@ namespace bom.Repositories.BOMStructures.Implementations
             
             BOMStructure bomStructure = new BOMStructure
             {
-                BOMId = result?.BOMId ?? 0,
+                Id = result?.Id ?? 0,
                 ItemMasterSalesId = result?.ItemMasterSalesId ?? 0,
                 ParentRawMaterialId = result?.ParentRawMaterialId ?? 0,
                 ChildRawMaterialId = result?.ChildRawMaterialId ?? 0
