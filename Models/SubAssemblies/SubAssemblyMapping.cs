@@ -16,9 +16,7 @@ namespace bom.Models.SubAssemblies
         public int ItemId { get; set; }
         public int? RawMaterialId { get; set; } 
         public decimal Quantity { get; set; }
-        public SubAssemblie SubAssemblie { get; set; }
-        public ItemMasterSale ItemMasterSale { get; set; }
-        public ItemMasterRawMaterial ItemMasterRawMaterial { get; set; } 
+
     }
 
 }

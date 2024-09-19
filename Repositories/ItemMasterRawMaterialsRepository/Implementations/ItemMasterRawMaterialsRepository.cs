@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using bom.Models.ItemMasterRawMaterials;
+using bom.Models.ItemMasterSales;
 using bom.Repositories.ItemMasterRawMaterials.Abstractions;
 using Dapper;
 
@@ -37,7 +38,7 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
                         CostPerUnit = itemMasterRawMaterial.CostPerUnit
                     }, transaction: tran);
 
-                    itemMasterRawMaterial.Id = id.Single();
+                    itemMasterRawMaterial.Id = id.Single(); 
 
                     CommitTransaction(tran);
 
@@ -73,10 +74,10 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
 
             var retVal = result.ToList();
 
-            List<ItemMasterRawMaterial> itemMasterRawMaterialsList = new List<ItemMasterRawMaterial>();
-            foreach (var rawItemMasterRawMaterialObj in retVal)
+            var itemMasterRawMaterialsList = new List<ItemMasterRawMaterial>();
+            foreach (var item in retVal)
             {
-                ItemMasterRawMaterial itemMasterRawMaterial = await GetItemMasterRawMaterialObjectFromResult(rawItemMasterRawMaterialObj);
+                ItemMasterRawMaterial itemMasterRawMaterial = await GetItemMasterRawMaterialObjectFromResult(item);
                 itemMasterRawMaterialsList.Add(itemMasterRawMaterial);
             }
 
@@ -92,15 +93,9 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
                                              commandType: CommandType.StoredProcedure
                                              ).ConfigureAwait(false);
 
-            if (result != null && result.Any())
-            {
-                ItemMasterRawMaterial itemMasterRawMaterial = await GetItemMasterRawMaterialObjectFromResult(result.FirstOrDefault()).ConfigureAwait(false);
-                return itemMasterRawMaterial;
-            }
-            else
-            {
-                return null;
-            }
+            
+            return await GetItemMasterRawMaterialObjectFromResult(result.SingleOrDefault());
+
         }
 
         public async Task<ItemMasterRawMaterial> UpdateItemMasterRawMaterialAsync(ItemMasterRawMaterial itemMasterRawMaterial)
@@ -127,21 +122,20 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
             return itemMasterRawMaterial;
         }
 
-        private async Task<ItemMasterRawMaterial> GetItemMasterRawMaterialObjectFromResult(dynamic rawItemMasterRawMaterialObject)
+        private async Task<ItemMasterRawMaterial> GetItemMasterRawMaterialObjectFromResult(dynamic result)
         {
-            ItemMasterRawMaterial itemMasterRawMaterial = new ItemMasterRawMaterial
-            {
-                Id = rawItemMasterRawMaterialObject?.Id ?? 0,
-                ItemMasterSalesId = rawItemMasterRawMaterialObject?.ItemMasterSalesId ?? 0,
-                ItemName = rawItemMasterRawMaterialObject?.ItemName ?? string.Empty,
-                ItemCode = rawItemMasterRawMaterialObject?.ItemCode ?? string.Empty,
-                Grade = rawItemMasterRawMaterialObject?.Grade ?? string.Empty,
-                UOM = rawItemMasterRawMaterialObject?.UOM ?? string.Empty,
-                Quantity = rawItemMasterRawMaterialObject?.Quantity ?? 0,
-                Level = rawItemMasterRawMaterialObject?.Level ?? 0,
-                PType = rawItemMasterRawMaterialObject?.PType ?? string.Empty,
-                CostPerUnit = rawItemMasterRawMaterialObject?.CostPerUnit ?? 0
-            };
+            ItemMasterRawMaterial itemMasterRawMaterial = new ItemMasterRawMaterial();
+
+            itemMasterRawMaterial.ItemMasterSalesId = result.ItemMasterSalesID;
+            itemMasterRawMaterial.ItemName = result.ItemName;
+            itemMasterRawMaterial.ItemCode = result.ItemCode;
+            itemMasterRawMaterial.Grade = result.Grade;
+            itemMasterRawMaterial.UOM = result.UOM;
+            itemMasterRawMaterial.Quantity = result.Quantity;
+            itemMasterRawMaterial.Level = result.Level;
+            itemMasterRawMaterial.PType = result.PType;
+            itemMasterRawMaterial.CostPerUnit = result.CostPerUnit;
+            
 
             return itemMasterRawMaterial;
         }

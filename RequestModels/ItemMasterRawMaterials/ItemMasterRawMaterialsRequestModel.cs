@@ -10,7 +10,7 @@ namespace bom.API.RequestModels.ItemMasterRawMaterials
     public class ItemMasterRawMaterialsRequestModel
     {
         public int Id { get; set; }
-        public int ItemMasterSaleId { get; set; } // ID reference to ItemMasterSale
+        public int ItemMasterSalesId { get; set; } 
         public string ItemName { get; set; }
         public string ItemCode { get; set; }
         public string Grade { get; set; }

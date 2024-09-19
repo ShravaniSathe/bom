@@ -9,17 +9,12 @@ namespace bom.Managers.ItemMasterRawMaterials.Implementations
     public class RawMaterialBoughtOutMappingManager : IRawMaterialBoughtOutMappingManager
     {
         private readonly IRawMaterialBoughtOutMappingRepository _repo;
-        //private string connectionString;
+       
 
         public RawMaterialBoughtOutMappingManager(IRawMaterialBoughtOutMappingRepository repo)
         {
             _repo = repo;
         }
-
-        //public RawMaterialBoughtOutMappingManager(string connectionString)
-        //{
-            //this.connectionString = connectionString;
-       // }
 
         public async Task<RawMaterialBoughtOutMapping> AddRawMaterialBoughtOutMappingAsync(RawMaterialBoughtOutMapping mapping)
         {

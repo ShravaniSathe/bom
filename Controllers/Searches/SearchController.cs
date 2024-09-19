@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using bom.Models.Searches;
-using bom.Managers.Search.Abstractions; // Assuming you have a Search Manager for handling search logic
+using bom.Managers.Search.Abstractions; 
 
 namespace bom.API.Controllers
 {

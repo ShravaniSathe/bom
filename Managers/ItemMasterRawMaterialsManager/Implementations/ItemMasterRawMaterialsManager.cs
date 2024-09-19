@@ -39,5 +39,6 @@ namespace bom.Managers.ItemMasterRawMaterials.Implementations
         {
             return await _repo.UpdateItemMasterRawMaterialAsync(itemMasterRawMaterial);
         }
+
     }
 }

@@ -9,17 +9,12 @@ namespace bom.Managers.BoughtOutItems
     public class BoughtOutItemMappingManager : IBoughtOutItemMappingManager
     {
         private readonly IBoughtOutItemMappingRepository _boughtOutItemMappingRepository;
-        //private string connectionString;
+     
 
         public BoughtOutItemMappingManager(IBoughtOutItemMappingRepository boughtOutItemMappingRepository)
         {
             _boughtOutItemMappingRepository = boughtOutItemMappingRepository;
         }
-
-        //public BoughtOutItemMappingManager(string connectionString)
-        //{
-           // this.connectionString = connectionString;
-        //}
 
         public async Task<BoughtOutItemMapping> AddBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
         {

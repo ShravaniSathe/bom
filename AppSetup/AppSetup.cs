@@ -72,19 +72,19 @@ namespace bom.API.AppSetup
         {
             // ItemMasterSales
             services.AddScoped<IItemMasterSalesRepository>(x => new ItemMasterSalesRepository(connectionString));
-            services.AddScoped<IItemRawMaterialMappingRepository>(x => new ItemRawMaterialMappingRepository(connectionString)); // Corrected this to repository, not manager
+            services.AddScoped<IItemRawMaterialMappingRepository>(x => new ItemRawMaterialMappingRepository(connectionString)); 
 
             // ItemMasterRawMaterials
             services.AddScoped<IItemMasterRawMaterialsRepository>(x => new ItemMasterRawMaterialsRepository(connectionString));
-            services.AddScoped<IRawMaterialBoughtOutMappingRepository>(x => new RawMaterialBoughtOutMappingRepository(connectionString)); // Corrected this to repository
+            services.AddScoped<IRawMaterialBoughtOutMappingRepository>(x => new RawMaterialBoughtOutMappingRepository(connectionString)); 
 
             // SubAssemblies
             services.AddScoped<ISubAssembliesRepository>(x => new SubAssembliesRepository(connectionString));
-            services.AddScoped<ISubAssemblyMappingRepository>(x => new SubAssemblyMappingRepository(connectionString)); // Corrected this to repository
+            services.AddScoped<ISubAssemblyMappingRepository>(x => new SubAssemblyMappingRepository(connectionString)); 
 
             // BoughtOutItems
             services.AddScoped<IBoughtOutItemsRepository>(x => new BoughtOutItemsRepository(connectionString));
-            services.AddScoped<IBoughtOutItemMappingRepository>(x => new BoughtOutItemMappingRepository(connectionString)); // Corrected this to repository
+            services.AddScoped<IBoughtOutItemMappingRepository>(x => new BoughtOutItemMappingRepository(connectionString)); 
 
             // BOMStructures
             services.AddScoped<IBOMStructuresRepository>(x => new BOMStructuresRepository(connectionString));

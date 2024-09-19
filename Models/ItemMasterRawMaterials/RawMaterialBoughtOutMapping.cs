@@ -13,7 +13,6 @@ namespace bom.Models.ItemMasterRawMaterials
         public int ItemMasterRawMaterialId { get; set; }
         public int BoughtOutId { get; set; }
         public decimal CostPerUnit { get; set; }
-        public ItemMasterRawMaterial ItemMasterRawMaterial { get; set; }
-        public BoughtOutItem BoughtOutItem { get; set; }
+
     }
 }

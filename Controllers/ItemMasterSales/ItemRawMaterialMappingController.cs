@@ -107,8 +107,8 @@ namespace bom.API.Controllers
             return new ItemRawMaterialMapping
             {
                 Id = requestModel.Id,
-                ItemMasterSalesId = requestModel.ItemMasterSalesId, // Assign the int directly
-                ItemMasterRawMaterialId = requestModel.ItemMasterRawMaterialId, // Assign the int directly
+                ItemMasterSalesId = requestModel.ItemMasterSalesId, 
+                ItemMasterRawMaterialId = requestModel.ItemMasterRawMaterialId, 
                 Quantity = requestModel.Quantity,
                 ProcureType = requestModel.ProcureType
             };

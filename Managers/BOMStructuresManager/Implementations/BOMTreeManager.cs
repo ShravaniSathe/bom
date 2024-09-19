@@ -19,28 +19,22 @@ namespace bom.Managers.BOMStructures
 
         public async Task<BOMTree> CreateBOMTreeAsync(BOMTree bomTree)
         {
-            // Implementation to create a BOM tree in the database
-            // For example, insert BOM tree and nodes into the database
             await _bomTreeRepository.CreateBOMTreeAsync(bomTree);
             return bomTree;
         }
 
         public async Task<BOMTree> GetBOMTreeAsync(int bomId)
         {
-            // Implementation to retrieve a BOM tree from the database
-            // For example, fetch BOM tree and nodes based on bomId
             var bomTree = await _bomTreeRepository.GetBOMTreeByIdAsync(bomId);
             return bomTree;
         }
 
         public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
         {
-            // Implementation to update an existing BOM tree in the database
-            // For example, update BOM tree and nodes based on BOMId
             var existingBOMTree = await _bomTreeRepository.GetBOMTreeByIdAsync(bomTree.BOMId);
             if (existingBOMTree == null)
             {
-                return null; // BOM tree not found
+                return null; 
             }
 
             await _bomTreeRepository.UpdateBOMTreeAsync(bomTree);
@@ -49,8 +43,6 @@ namespace bom.Managers.BOMStructures
 
         public async Task DeleteBOMTreeAsync(int bomId)
         {
-            // Implementation to delete a BOM tree from the database
-            // For example, delete BOM tree and nodes based on bomId
             await _bomTreeRepository.DeleteBOMTreeAsync(bomId);
         }
     }

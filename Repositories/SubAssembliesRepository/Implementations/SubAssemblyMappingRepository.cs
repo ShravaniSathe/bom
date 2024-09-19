@@ -33,8 +33,7 @@ namespace bom.Repositories.SubAssemblies.Implementations
                         Quantity = subAssemblyMapping.Quantity
                     }, transaction: tran);
 
-                    // You might need to set the Id property if you have one for SubAssemblyMapping.
-                    // subAssemblyMapping.Id = id.Single(); // Uncomment if Id is used.
+                    subAssemblyMapping.Id = id.Single(); 
 
                     CommitTransaction(tran);
 

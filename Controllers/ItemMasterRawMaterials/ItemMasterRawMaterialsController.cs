@@ -107,6 +107,7 @@ namespace bom.API.Controllers
             var itemMasterRawMaterial = new ItemMasterRawMaterial
             {
                 Id = itemMasterRawMaterialsRequest.Id,
+                ItemMasterSalesId = itemMasterRawMaterialsRequest.ItemMasterSalesId,
                 ItemName = itemMasterRawMaterialsRequest.ItemName,
                 ItemCode = itemMasterRawMaterialsRequest.ItemCode,
                 Grade = itemMasterRawMaterialsRequest.Grade,

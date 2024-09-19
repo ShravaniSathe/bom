@@ -19,7 +19,7 @@ using System.Threading.Tasks;
         {
             public int Id { get; set; }
             public string Name { get; set; }
-            public int? ParentId { get; set; } // Add this property for parent-child relationships
+            public int? ParentId { get; set; } 
             public List<BOMTreeNode> Children { get; set; }
         }
 

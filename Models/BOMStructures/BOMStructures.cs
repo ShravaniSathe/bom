@@ -12,9 +12,8 @@ namespace bom.Models.BOMStructures
     {
         public int Id { get; set; }
         public int ItemMasterSalesId { get; set; }
-        public int ParentRawMaterialId { get; set; }
+        public int? ParentRawMaterialId { get; set; }
         public int ChildRawMaterialId { get; set; }
-        public ItemMasterRawMaterial ItemMasterRawMaterial { get; set; }
-        public ItemMasterSale ItemMasterSale { get; set; }
+        
     }
 }

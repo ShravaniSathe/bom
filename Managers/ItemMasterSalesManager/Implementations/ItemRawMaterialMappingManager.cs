@@ -10,17 +10,12 @@ namespace bom.Managers.ItemRawMaterialMappings.Implementations
     public class ItemRawMaterialMappingManager : IItemRawMaterialMappingManager
     {
         private readonly IItemRawMaterialMappingRepository _repo;
-       // private string connectionString;
+   
 
         public ItemRawMaterialMappingManager(IItemRawMaterialMappingRepository repo)
         {
             _repo = repo;
         }
-
-       // public ItemRawMaterialMappingManager(string connectionString)
-       // {
-           // this.connectionString = connectionString;
-       // }
 
         public async Task<ItemRawMaterialMapping> AddItemRawMaterialMappingAsync(ItemRawMaterialMapping itemRawMaterialMapping)
         {

@@ -21,12 +21,12 @@ namespace bom.Repositories.BOMStructures.Implementations
                 try
                 {
                     const string sql = "INSERT INTO dbo.BOMStructures (ItemMasterSalesId, ParentRawMaterialId, ChildRawMaterialId) " +
-                                       "VALUES (@ItemMasterSalesId, @ParentRawMaterialId, @ChildRawMaterialId); " +
-                                       "SELECT CAST(SCOPE_IDENTITY() as int)";
+                    "VALUES (@ItemMasterSalesId, @ParentRawMaterialId, @ChildRawMaterialId); " +
+                    "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
                         ItemMasterSalesId = bomStructure.ItemMasterSalesId,
-                        ParentRawMaterialId = bomStructure.ParentRawMaterialId,
+                        ParentRawMaterialId = bomStructure.ParentRawMaterialId,  
                         ChildRawMaterialId = bomStructure.ChildRawMaterialId
                     }, transaction: tran);
 
@@ -104,14 +104,13 @@ namespace bom.Repositories.BOMStructures.Implementations
 
         private async Task<BOMStructure> GetBOMStructureObjectFromResult(dynamic result)
         {
+
+            BOMStructure bomStructure = new BOMStructure();
+
+            bomStructure.ItemMasterSalesId = result.ItemMasterSalesId;
+            bomStructure.ParentRawMaterialId = result?.ParentRawMaterialId ?? 0;
+            bomStructure.ChildRawMaterialId = result.ChildRawMaterialId;
             
-            BOMStructure bomStructure = new BOMStructure
-            {
-                Id = result?.Id ?? 0,
-                ItemMasterSalesId = result?.ItemMasterSalesId ?? 0,
-                ParentRawMaterialId = result?.ParentRawMaterialId ?? 0,
-                ChildRawMaterialId = result?.ChildRawMaterialId ?? 0
-            };
 
             return bomStructure;
         }

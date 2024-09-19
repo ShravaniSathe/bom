@@ -19,6 +19,6 @@ namespace bom.Models.ItemMasterRawMaterials
         public int Level { get; set; }
         public string PType { get; set; }
         public decimal CostPerUnit { get; set; }
-        public ItemMasterSale ItemMasterSale { get; set; }
+      
     }
 }

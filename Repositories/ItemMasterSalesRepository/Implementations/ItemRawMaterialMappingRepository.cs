@@ -25,8 +25,8 @@ namespace bom.Repositories.ItemMasterSales.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.ItemRawMaterialMapping (ItemMasterSaleId, ItemMasterRawMaterialId, Quantity, ProcureType) " +
-                                       "VALUES (@ItemMasterSaleId, @ItemMasterRawMaterialId, @Quantity, @ProcureType); " +
+                    const string sql = "INSERT INTO dbo.ItemRawMaterialMapping (ItemMasterSalesId, ItemMasterRawMaterialId, Quantity, ProcureType) " +
+                                       "VALUES (@ItemMasterSalesId, @ItemMasterRawMaterialId, @Quantity, @ProcureType); " +
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
