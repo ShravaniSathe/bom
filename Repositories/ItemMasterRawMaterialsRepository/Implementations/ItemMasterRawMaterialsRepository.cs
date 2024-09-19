@@ -21,12 +21,12 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.ItemMasterRawMaterials (ItemMasterSaleId, ItemName, ItemCode, Grade, UOM, Quantity, Level, PType, CostPerUnit) " +
-                                       "VALUES (@ItemMasterSaleId, @ItemName, @ItemCode, @Grade, @UOM, @Quantity, @Level, @PType, @CostPerUnit); " +
+                    const string sql = "INSERT INTO dbo.ItemMasterRawMaterials (ItemMasterSalesId, ItemName, ItemCode, Grade, UOM, Quantity, Level, PType, CostPerUnit) " +
+                                       "VALUES (@ItemMasterSalesId, @ItemName, @ItemCode, @Grade, @UOM, @Quantity, @Level, @PType, @CostPerUnit); " +
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
-                        ItemMasterSaleId = itemMasterRawMaterial.ItemMasterSaleId,
+                        ItemMasterSalesId = itemMasterRawMaterial.ItemMasterSalesId,
                         ItemName = itemMasterRawMaterial.ItemName,
                         ItemCode = itemMasterRawMaterial.ItemCode,
                         Grade = itemMasterRawMaterial.Grade,
@@ -111,7 +111,7 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
                                 new
                                 {
                                     ItemMasterRawMaterialId = itemMasterRawMaterial.Id,
-                                    NewItemMasterSaleId = itemMasterRawMaterial.ItemMasterSaleId,
+                                    NewItemMasterSaleId = itemMasterRawMaterial.ItemMasterSalesId,
                                     NewItemName = itemMasterRawMaterial.ItemName,
                                     NewItemCode = itemMasterRawMaterial.ItemCode,
                                     NewGrade = itemMasterRawMaterial.Grade,
@@ -132,7 +132,7 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
             ItemMasterRawMaterial itemMasterRawMaterial = new ItemMasterRawMaterial
             {
                 Id = rawItemMasterRawMaterialObject?.Id ?? 0,
-                ItemMasterSaleId = rawItemMasterRawMaterialObject?.ItemMasterSaleId ?? 0,
+                ItemMasterSalesId = rawItemMasterRawMaterialObject?.ItemMasterSalesId ?? 0,
                 ItemName = rawItemMasterRawMaterialObject?.ItemName ?? string.Empty,
                 ItemCode = rawItemMasterRawMaterialObject?.ItemCode ?? string.Empty,
                 Grade = rawItemMasterRawMaterialObject?.Grade ?? string.Empty,

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Dapper;
 using bom.Models.BOMStructure;
 using bom.Repositories.BOMStructures.Abstractions;
-using Dapper;
 
 namespace bom.Repositories.BOMStructures.Implementations
 {
@@ -22,14 +21,16 @@ namespace bom.Repositories.BOMStructures.Implementations
             {
                 try
                 {
-                    var parameters = new DynamicParameters();
-                    parameters.Add("BOMName", bomTree.BOMName);
-                    parameters.Add("BOMId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                    // Insert BOMTree record
+                    const string insertBOMTreeSql = "INSERT INTO dbo.BOMTrees (BOMName) " +
+                                                    "VALUES (@BOMName); " +
+                                                    "SELECT CAST(SCOPE_IDENTITY() as int)";
+                    var bomId = await db.QuerySingleAsync<int>(insertBOMTreeSql,
+                        new { bomTree.BOMName }, transaction: tran);
 
-                    await db.ExecuteAsync("sp_InsertBOMTree", parameters, commandType: CommandType.StoredProcedure, transaction: tran);
+                    bomTree.BOMId = bomId;
 
-                    bomTree.BOMId = parameters.Get<int>("BOMId");
-
+                    // Insert BOMTreeNode records
                     foreach (var node in bomTree.Nodes)
                     {
                         await InsertBOMTreeNodeAsync(bomTree.BOMId, node, tran);
@@ -49,15 +50,17 @@ namespace bom.Repositories.BOMStructures.Implementations
 
         private async Task InsertBOMTreeNodeAsync(int bomId, BOMTreeNode node, IDbTransaction transaction)
         {
-            var parameters = new DynamicParameters();
-            parameters.Add("BOMId", bomId);
-            parameters.Add("Name", node.Name);
-            parameters.Add("ParentId", node.ParentId, DbType.Int32, ParameterDirection.Input);
-            parameters.Add("NodeId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            const string insertBOMTreeNodeSql = "INSERT INTO dbo.BOMTreeNodes (BOMId, Name, ParentId) " +
+                                                "VALUES (@BOMId, @Name, @ParentId); " +
+                                                "SELECT CAST(SCOPE_IDENTITY() as int)";
+            var nodeId = await db.QuerySingleAsync<int>(insertBOMTreeNodeSql, new
+            {
+                BOMId = bomId,
+                node.Name,
+                ParentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value
+            }, transaction: transaction);
 
-            await db.ExecuteAsync("sp_InsertBOMTreeNode", parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
-
-            var nodeId = parameters.Get<int>("NodeId");
+            node.Id = nodeId;
 
             foreach (var child in node.Children)
             {
@@ -69,7 +72,8 @@ namespace bom.Repositories.BOMStructures.Implementations
         {
             const string storedProcedureName = "sp_GetBOMTreeById";
 
-            var result = await db.QueryMultipleAsync(storedProcedureName, new { BOMId = bomId }, commandType: CommandType.StoredProcedure);
+            var result = await db.QueryMultipleAsync(storedProcedureName,
+                new { BOMId = bomId }, commandType: CommandType.StoredProcedure);
 
             var bomTree = result.Read<BOMTree>().SingleOrDefault();
             var nodes = result.Read<BOMTreeNode>().ToList();
@@ -101,27 +105,73 @@ namespace bom.Repositories.BOMStructures.Implementations
             return bomTree;
         }
 
-
-
         public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
         {
-            const string storedProcedureName = "sp_UpdateBOMTree";
-
-            await db.ExecuteAsync(storedProcedureName, new
+            using (var tran = BeginTransaction())
             {
-                Id = bomTree.BOMId,
-                NewBOMName = bomTree.BOMName
-            }, commandType: CommandType.StoredProcedure);
-            return bomTree;
-            // Update BOM Tree Nodes
-            // (Additional implementation if needed)
+                try
+                {
+                    // Update BOMTree record
+                    const string updateBOMTreeSql = "UPDATE dbo.BOMTrees SET BOMName = @NewBOMName WHERE BOMId = @Id";
+                    await db.ExecuteAsync(updateBOMTreeSql,
+                        new { Id = bomTree.BOMId, NewBOMName = bomTree.BOMName },
+                        transaction: tran);
+
+                    // Update BOMTreeNode records
+                    foreach (var node in bomTree.Nodes)
+                    {
+                        await UpdateBOMTreeNodeAsync(node, tran);
+                    }
+
+                    CommitTransaction(tran);
+
+                    return bomTree;
+                }
+                catch (Exception)
+                {
+                    RollbackTransaction(tran);
+                    throw;
+                }
+            }
+        }
+
+        private async Task UpdateBOMTreeNodeAsync(BOMTreeNode node, IDbTransaction transaction)
+        {
+            const string updateBOMTreeNodeSql = "UPDATE dbo.BOMTreeNodes SET Name = @NewName, ParentId = @NewParentId " +
+                                                 "WHERE Id = @Id";
+            await db.ExecuteAsync(updateBOMTreeNodeSql, new
+            {
+                Id = node.Id,
+                NewName = node.Name,
+                NewParentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value
+            }, transaction: transaction);
+
+            foreach (var child in node.Children)
+            {
+                await UpdateBOMTreeNodeAsync(child, transaction);
+            }
         }
 
         public async Task DeleteBOMTreeAsync(int bomId)
         {
-            const string storedProcedureName = "sp_DeleteBOMTree";
+            const string deleteBOMTreeNodesSql = "DELETE FROM dbo.BOMTreeNodes WHERE BOMId = @BOMId";
+            const string deleteBOMTreeSql = "DELETE FROM dbo.BOMTrees WHERE BOMId = @BOMId";
 
-            await db.ExecuteAsync(storedProcedureName, new { BOMId = bomId }, commandType: CommandType.StoredProcedure);
+            using (var tran = BeginTransaction())
+            {
+                try
+                {
+                    await db.ExecuteAsync(deleteBOMTreeNodesSql, new { BOMId = bomId }, transaction: tran);
+                    await db.ExecuteAsync(deleteBOMTreeSql, new { BOMId = bomId }, transaction: tran);
+
+                    CommitTransaction(tran);
+                }
+                catch (Exception)
+                {
+                    RollbackTransaction(tran);
+                    throw;
+                }
+            }
         }
     }
 }

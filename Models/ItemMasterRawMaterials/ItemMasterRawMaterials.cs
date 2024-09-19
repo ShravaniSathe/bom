@@ -10,7 +10,7 @@ namespace bom.Models.ItemMasterRawMaterials
     public class ItemMasterRawMaterial : IEntity
     {
         public int Id { get; set; }
-        public int ItemMasterSaleId { get; set; }
+        public int ItemMasterSalesId { get; set; }
         public string ItemName { get; set; }
         public string ItemCode { get; set; }
         public string Grade { get; set; }

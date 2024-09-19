@@ -25,14 +25,15 @@ namespace bom.Repositories.ItemMasterSales.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.ItemRawMaterialMappings (ItemMasterSaleId, ItemMasterRawMaterialId, Quantity) " +
-                                       "VALUES (@ItemMasterSaleId, @ItemMasterRawMaterialId, @Quantity); " +
+                    const string sql = "INSERT INTO dbo.ItemRawMaterialMapping (ItemMasterSaleId, ItemMasterRawMaterialId, Quantity, ProcureType) " +
+                                       "VALUES (@ItemMasterSaleId, @ItemMasterRawMaterialId, @Quantity, @ProcureType); " +
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
                         ItemMasterSalesId = itemRawMaterialMapping.ItemMasterSalesId,
                         ItemMasterRawMaterialId = itemRawMaterialMapping.ItemMasterRawMaterialId,
-                        Quantity = itemRawMaterialMapping.Quantity
+                        Quantity = itemRawMaterialMapping.Quantity,
+                        ProcureType = itemRawMaterialMapping.ProcureType
                     }, transaction: tran);
 
                     itemRawMaterialMapping.Id = id.Single();
@@ -126,7 +127,8 @@ namespace bom.Repositories.ItemMasterSales.Implementations
                 Id = rawItemRawMaterialMappingObject?.Id ?? 0,
                 ItemMasterSalesId = rawItemRawMaterialMappingObject?.ItemMasterSalesId ?? 0,
                 ItemMasterRawMaterialId = rawItemRawMaterialMappingObject?.ItemMasterRawMaterialId ?? 0,
-                Quantity = rawItemRawMaterialMappingObject?.Quantity ?? 0
+                Quantity = rawItemRawMaterialMappingObject?.Quantity ?? 0,
+                ProcureType = rawItemRawMaterialMappingObject?.ProcureType
             };
 
             return itemRawMaterialMapping;

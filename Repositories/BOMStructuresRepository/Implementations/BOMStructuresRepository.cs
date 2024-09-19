@@ -25,12 +25,12 @@ namespace bom.Repositories.BOMStructures.Implementations
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
-                        bomStructure.ItemMasterSalesId,
-                        bomStructure.ParentRawMaterialId,
-                        bomStructure.ChildRawMaterialId
+                        ItemMasterSalesId = bomStructure.ItemMasterSalesId,
+                        ParentRawMaterialId = bomStructure.ParentRawMaterialId,
+                        ChildRawMaterialId = bomStructure.ChildRawMaterialId
                     }, transaction: tran);
 
-                    bomStructure.Id = id.Single();
+                    bomStructure.BOMId = id.Single();
 
                     CommitTransaction(tran);
 
@@ -48,39 +48,46 @@ namespace bom.Repositories.BOMStructures.Implementations
         {
             const string storedProcedureName = "dbo.GetBOMStructureById";
 
-            var result = await db.QueryAsync<BOMStructure>(storedProcedureName,
-                                                            new { Id = id },
-                                                            commandType: CommandType.StoredProcedure
-                                                            ).ConfigureAwait(false);
+            var result = await db.QueryAsync<dynamic>(storedProcedureName,
+                                                       new { Id = id },
+                                                       commandType: CommandType.StoredProcedure
+                                                       ).ConfigureAwait(false);
 
-            return result.SingleOrDefault();
+            return await GetBOMStructureObjectFromResult(result.SingleOrDefault());
         }
 
         public async Task<IEnumerable<BOMStructure>> GetAllBOMStructuresAsync()
         {
             const string storedProcedureName = "dbo.GetAllBOMStructures";
 
-            var result = await db.QueryAsync<BOMStructure>(storedProcedureName,
-                                                            commandType: CommandType.StoredProcedure
-                                                            ).ConfigureAwait(false);
+            var result = await db.QueryAsync<dynamic>(storedProcedureName,
+                                                       commandType: CommandType.StoredProcedure
+                                                       ).ConfigureAwait(false);
 
-            return result;
+            var bomStructuresList = new List<BOMStructure>();
+            foreach (var item in result)
+            {
+                var bomStructure = await GetBOMStructureObjectFromResult(item);
+                bomStructuresList.Add(bomStructure);
+            }
+
+            return bomStructuresList;
         }
 
         public async Task<BOMStructure> UpdateBOMStructureAsync(BOMStructure bomStructure)
         {
             const string storedProcedureName = "dbo.UpdateBOMStructure";
 
-            var result = await db.ExecuteAsync(storedProcedureName,
-                                               new
-                                               {
-                                                   BOMStructureId = bomStructure.Id,
-                                                   NewItemMasterSalesId = bomStructure.ItemMasterSalesId,
-                                                   NewParentRawMaterialId = bomStructure.ParentRawMaterialId,
-                                                   NewChildRawMaterialId = bomStructure.ChildRawMaterialId
-                                               },
-                                               commandType: CommandType.StoredProcedure
-                                               ).ConfigureAwait(false);
+            await db.ExecuteAsync(storedProcedureName,
+                                  new
+                                  {
+                                      Id = bomStructure.BOMId,
+                                      NewItemMasterSalesId = bomStructure.ItemMasterSalesId,
+                                      NewParentRawMaterialId = bomStructure.ParentRawMaterialId,
+                                      NewChildRawMaterialId = bomStructure.ChildRawMaterialId
+                                  },
+                                  commandType: CommandType.StoredProcedure
+                                  ).ConfigureAwait(false);
 
             return bomStructure;
         }
@@ -93,6 +100,20 @@ namespace bom.Repositories.BOMStructures.Implementations
                                   new { Id = id },
                                   commandType: CommandType.StoredProcedure
                                   ).ConfigureAwait(false);
+        }
+
+        private async Task<BOMStructure> GetBOMStructureObjectFromResult(dynamic result)
+        {
+            
+            BOMStructure bomStructure = new BOMStructure
+            {
+                BOMId = result?.BOMId ?? 0,
+                ItemMasterSalesId = result?.ItemMasterSalesId ?? 0,
+                ParentRawMaterialId = result?.ParentRawMaterialId ?? 0,
+                ChildRawMaterialId = result?.ChildRawMaterialId ?? 0
+            };
+
+            return bomStructure;
         }
     }
 }

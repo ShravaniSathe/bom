@@ -25,13 +25,13 @@ namespace bom.Repositories.BoughtOutItems.Implementations
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
-                        boughtOutItem.ItemName,
-                        boughtOutItem.ItemCode,
-                        boughtOutItem.Grade,
-                        boughtOutItem.UOM,
-                        boughtOutItem.Quantity,
-                        boughtOutItem.Level,
-                        boughtOutItem.CostPerUnit
+                        ItemName = boughtOutItem.ItemName,
+                        ItemCode = boughtOutItem.ItemCode,
+                        Grade = boughtOutItem.Grade,
+                        UOM = boughtOutItem.UOM,
+                        Quantity = boughtOutItem.Quantity,
+                        Level = boughtOutItem.Level,
+                        CostPerUnit = boughtOutItem.CostPerUnit
                     }, transaction: tran);
 
                     boughtOutItem.Id = id.Single();
@@ -52,43 +52,50 @@ namespace bom.Repositories.BoughtOutItems.Implementations
         {
             const string storedProcedureName = "dbo.GetBoughtOutItemById";
 
-            var result = await db.QueryAsync<BoughtOutItem>(storedProcedureName,
-                                                             new { Id = id },
-                                                             commandType: CommandType.StoredProcedure
-                                                             ).ConfigureAwait(false);
+            var result = await db.QueryAsync<dynamic>(storedProcedureName,
+                                                       new { Id = id },
+                                                       commandType: CommandType.StoredProcedure
+                                                       ).ConfigureAwait(false);
 
-            return result.SingleOrDefault();
+            return await GetBoughtOutItemObjectFromResult(result.SingleOrDefault());
         }
 
         public async Task<IEnumerable<BoughtOutItem>> GetAllBoughtOutItemsAsync()
         {
             const string storedProcedureName = "dbo.GetAllBoughtOutItems";
 
-            var result = await db.QueryAsync<BoughtOutItem>(storedProcedureName,
-                                                             commandType: CommandType.StoredProcedure
-                                                             ).ConfigureAwait(false);
+            var result = await db.QueryAsync<dynamic>(storedProcedureName,
+                                                       commandType: CommandType.StoredProcedure
+                                                       ).ConfigureAwait(false);
 
-            return result;
+            var boughtOutItemsList = new List<BoughtOutItem>();
+            foreach (var item in result)
+            {
+                var boughtOutItem = await GetBoughtOutItemObjectFromResult(item);
+                boughtOutItemsList.Add(boughtOutItem);
+            }
+
+            return boughtOutItemsList;
         }
 
         public async Task<BoughtOutItem> UpdateBoughtOutItemAsync(BoughtOutItem boughtOutItem)
         {
             const string storedProcedureName = "dbo.UpdateBoughtOutItem";
 
-            var result = await db.ExecuteAsync(storedProcedureName,
-                                               new
-                                               {
-                                                   BoughtOutItemId = boughtOutItem.Id,
-                                                   NewItemId = boughtOutItem.ItemName,
-                                                   NewItemCode = boughtOutItem.ItemCode,
-                                                   NewGrade = boughtOutItem.Grade,
-                                                   NewUOM = boughtOutItem.UOM,
-                                                   NewQuantity = boughtOutItem.Quantity,
-                                                   NewLevel = boughtOutItem.Level,
-                                                   NewCostPerUnit = boughtOutItem.CostPerUnit
-                                               },
-                                               commandType: CommandType.StoredProcedure
-                                               ).ConfigureAwait(false);
+            await db.ExecuteAsync(storedProcedureName,
+                                  new
+                                  {
+                                      Id = boughtOutItem.Id,
+                                      NewItemName = boughtOutItem.ItemName,
+                                      NewItemCode = boughtOutItem.ItemCode,
+                                      NewGrade = boughtOutItem.Grade,
+                                      NewUOM = boughtOutItem.UOM,
+                                      NewQuantity = boughtOutItem.Quantity,
+                                      NewLevel = boughtOutItem.Level,
+                                      NewCostPerUnit = boughtOutItem.CostPerUnit
+                                  },
+                                  commandType: CommandType.StoredProcedure
+                                  ).ConfigureAwait(false);
 
             return boughtOutItem;
         }
@@ -101,6 +108,23 @@ namespace bom.Repositories.BoughtOutItems.Implementations
                                   new { Id = id },
                                   commandType: CommandType.StoredProcedure
                                   ).ConfigureAwait(false);
+        }
+
+        private async Task<BoughtOutItem> GetBoughtOutItemObjectFromResult(dynamic result)
+        {
+            BoughtOutItem boughtOutItem = new BoughtOutItem
+            {
+                Id = result?.Id ?? 0,
+                ItemName = result?.ItemName ?? string.Empty,
+                ItemCode = result?.ItemCode ?? string.Empty,
+                Grade = result?.Grade ?? string.Empty,
+                UOM = result?.UOM ?? string.Empty,
+                Quantity = result?.Quantity ?? 0,
+                Level = result?.Level ?? string.Empty,
+                CostPerUnit = result?.CostPerUnit ?? 0
+            };
+
+            return boughtOutItem;
         }
     }
 }

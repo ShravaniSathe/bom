@@ -10,30 +10,27 @@ namespace bom.Repositories.BoughtOutItems.Implementations
 {
     public class BoughtOutItemMappingRepository : Repository<BoughtOutItemMapping>, IBoughtOutItemMappingRepository
     {
-        public BoughtOutItemMappingRepository(string connectionString) : 
-            base(connectionString)
+        public BoughtOutItemMappingRepository(string connectionString) : base(connectionString)
         {
-
-
         }
 
-    public async Task<BoughtOutItemMapping> AddBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
+        public async Task<BoughtOutItemMapping> AddBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
         {
             using (var tran = BeginTransaction())
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.BoughtOutItemMappings (BoughtOutItemId, ItemId, Quantity) " +
+                    const string sql = "INSERT INTO dbo.BoughtOutItemMapping (BoughtOutItemId, ItemId, Quantity) " +
                                        "VALUES (@BoughtOutItemId, @ItemId, @Quantity); " +
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
-                        boughtOutItemMapping.BoughtOutItemId,
-                        boughtOutItemMapping.ItemId,
-                        boughtOutItemMapping.Quantity
+                        BoughtOutItemId = boughtOutItemMapping.BoughtOutItemId,
+                        ItemId = boughtOutItemMapping.ItemId,
+                        Quantity = boughtOutItemMapping.Quantity
                     }, transaction: tran);
 
-                    boughtOutItemMapping.BoughtOutItemId = id.Single();
+                    boughtOutItemMapping.Id = id.Single();
 
                     CommitTransaction(tran);
 
@@ -51,38 +48,45 @@ namespace bom.Repositories.BoughtOutItems.Implementations
         {
             const string storedProcedureName = "dbo.GetBoughtOutItemMappingById";
 
-            var result = await db.QueryAsync<BoughtOutItemMapping>(storedProcedureName,
-                                                                    new { Id = id },
-                                                                    commandType: CommandType.StoredProcedure
-                                                                    ).ConfigureAwait(false);
+            var result = await db.QueryAsync<dynamic>(storedProcedureName,
+                                                       new { Id = id },
+                                                       commandType: CommandType.StoredProcedure
+                                                       ).ConfigureAwait(false);
 
-            return result.SingleOrDefault();
+            return await GetBoughtOutItemMappingObjectFromResult(result.SingleOrDefault());
         }
 
         public async Task<IEnumerable<BoughtOutItemMapping>> GetAllBoughtOutItemMappingsAsync()
         {
             const string storedProcedureName = "dbo.GetAllBoughtOutItemMappings";
 
-            var result = await db.QueryAsync<BoughtOutItemMapping>(storedProcedureName,
-                                                                    commandType: CommandType.StoredProcedure
-                                                                    ).ConfigureAwait(false);
+            var result = await db.QueryAsync<dynamic>(storedProcedureName,
+                                                       commandType: CommandType.StoredProcedure
+                                                       ).ConfigureAwait(false);
 
-            return result;
+            var boughtOutItemMappingsList = new List<BoughtOutItemMapping>();
+            foreach (var item in result)
+            {
+                var boughtOutItemMapping = await GetBoughtOutItemMappingObjectFromResult(item);
+                boughtOutItemMappingsList.Add(boughtOutItemMapping);
+            }
+
+            return boughtOutItemMappingsList;
         }
 
         public async Task<BoughtOutItemMapping> UpdateBoughtOutItemMappingAsync(BoughtOutItemMapping boughtOutItemMapping)
         {
             const string storedProcedureName = "dbo.UpdateBoughtOutItemMapping";
 
-            var result = await db.ExecuteAsync(storedProcedureName,
-                                               new
-                                               {
-                                                   Id = boughtOutItemMapping.BoughtOutItemId,
-                                                   NewItemId = boughtOutItemMapping.ItemId,
-                                                   NewQuantity = boughtOutItemMapping.Quantity
-                                               },
-                                               commandType: CommandType.StoredProcedure
-                                               ).ConfigureAwait(false);
+            await db.ExecuteAsync(storedProcedureName,
+                                  new
+                                  {
+                                      Id = boughtOutItemMapping.Id,
+                                      NewItemId = boughtOutItemMapping.ItemId,
+                                      NewQuantity = boughtOutItemMapping.Quantity
+                                  },
+                                  commandType: CommandType.StoredProcedure
+                                  ).ConfigureAwait(false);
 
             return boughtOutItemMapping;
         }
@@ -95,6 +99,19 @@ namespace bom.Repositories.BoughtOutItems.Implementations
                                   new { Id = id },
                                   commandType: CommandType.StoredProcedure
                                   ).ConfigureAwait(false);
+        }
+
+        private async Task<BoughtOutItemMapping> GetBoughtOutItemMappingObjectFromResult(dynamic result)
+        {
+            BoughtOutItemMapping boughtOutItemMapping = new BoughtOutItemMapping
+            {
+                Id = result?.Id ?? 0,
+                BoughtOutItemId = result?.BoughtOutItemId ?? 0,
+                ItemId = result?.ItemId ?? 0,
+                Quantity = result?.Quantity ?? 0
+            };
+
+            return boughtOutItemMapping;
         }
     }
 }

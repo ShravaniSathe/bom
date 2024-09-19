@@ -22,7 +22,7 @@ namespace bom.Repositories.SubAssemblies.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.SubAssemblyMappings (SubAssemblyId, ItemId, RawMaterialId, Quantity) " +
+                    const string sql = "INSERT INTO dbo.SubAssemblyMapping (SubAssemblyId, ItemId, RawMaterialId, Quantity) " +
                                        "VALUES (@SubAssemblyId, @ItemId, @RawMaterialId, @Quantity); " +
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
@@ -125,11 +125,7 @@ namespace bom.Repositories.SubAssemblies.Implementations
                 SubAssemblyId = rawSubAssemblyMappingObject?.SubAssemblyId ?? 0,
                 ItemId = rawSubAssemblyMappingObject?.ItemId ?? 0,
                 RawMaterialId = rawSubAssemblyMappingObject?.RawMaterialId,
-                Quantity = rawSubAssemblyMappingObject?.Quantity ?? 0,
-                // Mapping additional entities can be done here if needed
-                // SubAssemblie = ...
-                // ItemMasterSale = ...
-                // ItemMasterRawMaterial = ...
+                Quantity = rawSubAssemblyMappingObject?.Quantity ?? 0
             };
 
             return subAssemblyMapping;
