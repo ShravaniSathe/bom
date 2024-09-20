@@ -59,3 +59,4 @@ The BOM is often visualized as a tree-like structure where:
 - System.Data.SqlClient(4.8.6)
   
 *Set up the database connection string in appsettings.json*
+#### Refer https://github.com/ShravaniSathe/bomDB for Database Schema (Tables and StoredProcedures)
