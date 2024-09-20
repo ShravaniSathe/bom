@@ -29,20 +29,20 @@ Consider a scenario where you need to manufacture a Sedan Car. This car is the f
 In the BOM process, you continue breaking down each component until you reach the leaf nodes. A leaf node is a part that does not need further breakdown—it's either a raw material that is processed in-house or a bought-out item.
 
 # Example of a Complete BOM
-Sedan Car (1 Unit) - [Luxury, Manufactured]
-│
-├── Piston (4 Pieces) - [Standard, Manufactured]
-│   ├── Cylinder Head (1 Piece) - [Premium, Manufactured]
-│   │   └── Camshaft (1 Piece) - [Premium, Bought-Out]
-│   └── Sub-Assembly: Engine Assembly (1 Unit) - [Manufactured]
-│
-├── Sub-Assembly: Transmission (1 Unit) - [Manufactured]
-│ 
-├── Alloy Wheels (4 Sets) - [Luxury, Bought-Out]
-│
-├── Leather Seats (1 Set) - [Premium, Bought-Out]
-│
-└── Clutch (1 Piece) - [Standard, Bought-Out]
+**Sedan Car (1 Unit)** - [Luxury, Manufactured]  
+│  
+├── **Piston (4 Pieces)** - [Standard, Manufactured]  
+│   ├── **Cylinder Head (1 Piece)** - [Premium, Manufactured]  
+│   │   └── **Camshaft (1 Piece)** - [Premium, Bought-Out]  
+│   └── **Sub-Assembly: Engine Assembly (1 Unit)** - [Manufactured]  
+│  
+├── **Sub-Assembly: Transmission (1 Unit)** - [Manufactured]  
+│  
+├── **Alloy Wheels (4 Sets)** - [Luxury, Bought-Out]  
+│  
+├── **Leather Seats (1 Set)** - [Premium, Bought-Out]  
+│  
+└── **Clutch (1 Piece)** - [Standard, Bought-Out]
 
 - Root Node: The top-level product (Sedan Car).
 - Sub-Assemblies: Components like the Engine Assembly or Transmission, which are manufactured and need further breakdown.
@@ -62,4 +62,4 @@ Sedan Car (1 Unit) - [Luxury, Manufactured]
 - Swashbuckle.AspNetCore(6.4.0)
 - System.Data.SqlClient(4.8.6)
   
-# Set up the database connection string in appsettings.json.
+*Set up the database connection string in appsettings.json*
