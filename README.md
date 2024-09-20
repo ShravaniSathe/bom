@@ -21,12 +21,8 @@ The BOM is often visualized as a tree-like structure where:
 - The root node is the final product (e.g., a Sedan Car).
 - The child nodes are the components or sub-assemblies of that product.
 - This breakdown continues until all leaf nodes (the end components of the BOM) are bought-out items.
-
-## BOM Breakdown Example
-Consider a scenario where you need to manufacture a Sedan Car. This car is the final product, and it consists of several parts like the engine, transmission, wheels, seats, etc. Some of these parts may be sub-assemblies made from further components (like the Engine Assembly), and others may be bought-out items (like Alloy Wheels).
-
-## The Key Concept: Continuation Until All Leaf Nodes are Bought Out
-In the BOM process, you continue breaking down each component until you reach the leaf nodes. A leaf node is a part that does not need further breakdown—it's either a raw material that is processed in-house or a bought-out item.
+- Consider a scenario where you need to manufacture a Sedan Car. This car is the final product, and it consists of several parts like the engine, transmission, wheels, seats, etc. Some of these parts may be sub-assemblies made from further components (like the Engine Assembly), and others may be bought-out items (like Alloy Wheels).
+- In the BOM process, you continue breaking down each component until you reach the leaf nodes. A leaf node is a part that does not need further breakdown—it's either a raw material that is processed in-house or a bought-out item.
 
 ### Example of a Complete BOM
 **Sedan Car (1 Unit)** - [Luxury, Manufactured]  
