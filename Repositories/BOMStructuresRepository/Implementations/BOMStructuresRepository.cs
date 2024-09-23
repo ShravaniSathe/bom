@@ -106,7 +106,7 @@ namespace bom.Repositories.BOMStructures.Implementations
         {
 
             BOMStructure bomStructure = new BOMStructure();
-
+            bomStructure.Id = result.Id;
             bomStructure.ItemMasterSalesId = result.ItemMasterSalesId;
             bomStructure.ParentRawMaterialId = result?.ParentRawMaterialId ?? 0;
             bomStructure.ChildRawMaterialId = result.ChildRawMaterialId;
