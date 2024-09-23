@@ -12,8 +12,6 @@ namespace bom.Models.BoughtOutItems
         public int BoughtOutItemId { get; set; }
         public int ItemId { get; set; }
         public decimal Quantity { get; set; }
-        public BoughtOutItem BoughtOutItem { get; set; }
-        public ItemMasterSale ItemMasterSale { get; set; }
     }
 
 }

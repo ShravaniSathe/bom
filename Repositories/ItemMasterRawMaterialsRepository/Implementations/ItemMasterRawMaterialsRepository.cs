@@ -125,7 +125,7 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
         private async Task<ItemMasterRawMaterial> GetItemMasterRawMaterialObjectFromResult(dynamic result)
         {
             ItemMasterRawMaterial itemMasterRawMaterial = new ItemMasterRawMaterial();
-            itemMasterRawMaterial.Id = result.ID;
+            itemMasterRawMaterial.Id = result.Id;
             itemMasterRawMaterial.ItemMasterSalesId = result.ItemMasterSalesID;
             itemMasterRawMaterial.ItemName = result.ItemName;
             itemMasterRawMaterial.ItemCode = result.ItemCode;
