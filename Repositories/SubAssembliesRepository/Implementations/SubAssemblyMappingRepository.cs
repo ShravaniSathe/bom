@@ -121,7 +121,7 @@ namespace bom.Repositories.SubAssemblies.Implementations
         {
             SubAssemblyMapping subAssemblyMapping = new SubAssemblyMapping
             {
-                Id = rawSubAssemblyMappingObject?.Id ?? 0,
+                //Id = rawSubAssemblyMappingObject?.Id ?? 0,
                 SubAssemblyId = rawSubAssemblyMappingObject?.SubAssemblyId ?? 0,
                 ItemId = rawSubAssemblyMappingObject?.ItemId ?? 0,
                 RawMaterialId = rawSubAssemblyMappingObject?.RawMaterialId,
