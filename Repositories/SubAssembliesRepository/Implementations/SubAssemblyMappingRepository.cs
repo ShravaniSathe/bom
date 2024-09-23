@@ -111,7 +111,7 @@ namespace bom.Repositories.SubAssemblies.Implementations
                                                    NewRawMaterialId = subAssemblyMapping.RawMaterialId,
                                                    NewQuantity = subAssemblyMapping.Quantity
                                                },
-                                               commandType: CommandType.StoredProcedure
+                                               commandType: CommandType.StoredProcedure 
                                                ).ConfigureAwait(false);
 
             return subAssemblyMapping;
