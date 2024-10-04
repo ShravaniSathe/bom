@@ -105,14 +105,12 @@ namespace bom.API.Controllers
         {
             var boughtOutItem = new BoughtOutItem
             {
-                Id = boughtOutItemsRequest.Id,
+                SubAssemblyId = boughtOutItemsRequest.SubAssemblyId,
                 ItemName = boughtOutItemsRequest.ItemName,
-                ItemCode = boughtOutItemsRequest.ItemCode,
-                Grade = boughtOutItemsRequest.Grade,
                 UOM = boughtOutItemsRequest.UOM,
                 Quantity = boughtOutItemsRequest.Quantity,
-                Level = boughtOutItemsRequest.Level,
-                CostPerUnit = boughtOutItemsRequest.CostPerUnit
+                CostPerUnit = boughtOutItemsRequest.CostPerUnit,
+                ProcurementType = boughtOutItemsRequest.PType 
             };
 
             return boughtOutItem;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using bom.Models.SubAssemblies;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,12 +10,12 @@ namespace bom.Models.BoughtOutItems
     public class BoughtOutItem : IEntity
     {
         public int Id { get; set; }
-        public string ItemName { get; set; }
-        public string ItemCode { get; set; }
-        public string Grade { get; set; }
-        public string UOM { get; set; }
-        public int Quantity { get; set; }
-        public int Level { get; set; }
-        public decimal CostPerUnit { get; set; }
+        public int SubAssemblyId { get; set; } 
+        //public SubAssemblie SubAssembly { get; set; } 
+        public string ItemName { get; set; } 
+        public string UOM { get; set; } 
+        public int Quantity { get; set; } 
+        public decimal CostPerUnit { get; set; } 
+        public string ProcurementType { get; set; } = "BoughtOut"; 
     }
 }

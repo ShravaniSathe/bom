@@ -20,18 +20,17 @@ namespace bom.Repositories.BoughtOutItems.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.BoughtOutItems (ItemName, ItemCode, Grade, UOM, Quantity, Level, CostPerUnit) " +
-                                       "VALUES (@ItemName, @ItemCode, @Grade, @UOM, @Quantity, @Level, @CostPerUnit); " +
+                    const string sql = "INSERT INTO dbo.BoughtOutItems (SubAssemblyId, ItemName, UOM, Quantity, CostPerUnit, ProcurementType) " +
+                                       "VALUES (@SubAssemblyId, @ItemName, @UOM, @Quantity, @CostPerUnit, @ProcurementType); " +
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
+                        SubAssemblyId = boughtOutItem.SubAssemblyId, // Changed to match model
                         ItemName = boughtOutItem.ItemName,
-                        ItemCode = boughtOutItem.ItemCode,
-                        Grade = boughtOutItem.Grade,
                         UOM = boughtOutItem.UOM,
                         Quantity = boughtOutItem.Quantity,
-                        Level = boughtOutItem.Level,
-                        CostPerUnit = boughtOutItem.CostPerUnit
+                        CostPerUnit = boughtOutItem.CostPerUnit,
+                        ProcurementType = boughtOutItem.ProcurementType // Added to match model
                     }, transaction: tran);
 
                     boughtOutItem.Id = id.Single();
@@ -85,14 +84,12 @@ namespace bom.Repositories.BoughtOutItems.Implementations
             await db.ExecuteAsync(storedProcedureName,
                                   new
                                   {
-                                      Id = boughtOutItem.Id,
+                                      NewSubAssemblyId = boughtOutItem.SubAssemblyId, 
                                       NewItemName = boughtOutItem.ItemName,
-                                      NewItemCode = boughtOutItem.ItemCode,
-                                      NewGrade = boughtOutItem.Grade,
                                       NewUOM = boughtOutItem.UOM,
                                       NewQuantity = boughtOutItem.Quantity,
-                                      NewLevel = boughtOutItem.Level,
-                                      NewCostPerUnit = boughtOutItem.CostPerUnit
+                                      NewCostPerUnit = boughtOutItem.CostPerUnit,
+                                      NewProcurementType = boughtOutItem.ProcurementType
                                   },
                                   commandType: CommandType.StoredProcedure
                                   ).ConfigureAwait(false);
@@ -115,13 +112,12 @@ namespace bom.Repositories.BoughtOutItems.Implementations
             BoughtOutItem boughtOutItem = new BoughtOutItem
             {
                 Id = result?.Id ?? 0,
+                SubAssemblyId = result?.SubAssemblyId ?? 0, 
                 ItemName = result?.ItemName ?? string.Empty,
-                ItemCode = result?.ItemCode ?? string.Empty,
-                Grade = result?.Grade ?? string.Empty,
                 UOM = result?.UOM ?? string.Empty,
                 Quantity = result?.Quantity ?? 0,
-                Level = result?.Level ?? string.Empty,
-                CostPerUnit = result?.CostPerUnit ?? 0
+                CostPerUnit = result?.CostPerUnit ?? 0,
+                ProcurementType = result?.ProcurementType ?? "BoughtOut"
             };
 
             return boughtOutItem;

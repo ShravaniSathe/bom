@@ -20,14 +20,18 @@ namespace bom.Repositories.BOMStructures.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.BOMStructures (ItemMasterSalesId, ParentRawMaterialId, ChildRawMaterialId) " +
-                    "VALUES (@ItemMasterSalesId, @ParentRawMaterialId, @ChildRawMaterialId); " +
+                    const string sql = "INSERT INTO dbo.BOMStructures (ItemMasterSalesId, ParentSubAssemblyId, ChildSubAssemblyId, ChildRawMaterialId, Level, PType) " +
+                    "VALUES (@ItemMasterSalesId, @ParentSubAssemblyId, @ChildSubAssemblyId, @ChildRawMaterialId, @Level, @PType); " +
                     "SELECT CAST(SCOPE_IDENTITY() as int)";
+
                     var id = await db.QueryAsync<int>(sql, new
                     {
                         ItemMasterSalesId = bomStructure.ItemMasterSalesId,
-                        ParentRawMaterialId = bomStructure.ParentRawMaterialId,  
-                        ChildRawMaterialId = bomStructure.ChildRawMaterialId
+                        ParentSubAssemblyId = bomStructure.ParentSubAssemblyId,
+                        ChildSubAssemblyId = bomStructure.ChildSubAssemblyId,
+                        ChildRawMaterialId = bomStructure.ChildRawMaterialId,
+                        Level = bomStructure.Level,
+                        PType = bomStructure.PType
                     }, transaction: tran);
 
                     bomStructure.Id = id.Single();
@@ -83,8 +87,11 @@ namespace bom.Repositories.BOMStructures.Implementations
                                   {
                                       BOMId = bomStructure.Id,
                                       NewItemMasterSalesId = bomStructure.ItemMasterSalesId,
-                                      NewParentRawMaterialId = bomStructure.ParentRawMaterialId,
-                                      NewChildRawMaterialId = bomStructure.ChildRawMaterialId
+                                      NewParentSubAssemblyId = bomStructure.ParentSubAssemblyId,
+                                      NewChildSubAssemblyId = bomStructure.ChildSubAssemblyId,
+                                      NewChildRawMaterialId = bomStructure.ChildRawMaterialId,
+                                      NewLevel = bomStructure.Level,
+                                      NewPType = bomStructure.PType
                                   },
                                   commandType: CommandType.StoredProcedure
                                   ).ConfigureAwait(false);
@@ -104,13 +111,14 @@ namespace bom.Repositories.BOMStructures.Implementations
 
         private async Task<BOMStructure> GetBOMStructureObjectFromResult(dynamic result)
         {
-
             BOMStructure bomStructure = new BOMStructure();
-            bomStructure.Id = result.I;
+            bomStructure.Id = result.ID;
             bomStructure.ItemMasterSalesId = result.ItemMasterSalesId;
-            bomStructure.ParentRawMaterialId = result?.ParentRawMaterialId ?? 0;
+            bomStructure.ParentSubAssemblyId = result?.ParentSubAssemblyId;
+            bomStructure.ChildSubAssemblyId = result?.ChildSubAssemblyId;
             bomStructure.ChildRawMaterialId = result.ChildRawMaterialId;
-            
+            bomStructure.Level = result.Level;
+            bomStructure.PType = result.PType;
 
             return bomStructure;
         }

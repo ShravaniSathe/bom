@@ -106,10 +106,25 @@ namespace bom.API.Controllers
             var subAssembly = new SubAssemblie
             {
                 Id = subAssembliesRequest.Id,
+                ItemMasterSalesId = subAssembliesRequest.ItemMasterSalesId, 
                 ItemName = subAssembliesRequest.ItemName,
                 UOM = subAssembliesRequest.UOM,
-                CostPerUnit = subAssembliesRequest.CostPerUnit
+                CostPerUnit = subAssembliesRequest.CostPerUnit,
+                Level = subAssembliesRequest.Level, 
+                ParentSubAssemblyId = subAssembliesRequest.ParentSubAssemblyId,
+                PType = subAssembliesRequest.PType 
             };
+
+            
+            if (subAssembliesRequest.RawMaterials != null)
+            {
+                subAssembly.RawMaterials = subAssembliesRequest.RawMaterials; 
+            }
+
+            if (subAssembliesRequest.ChildSubAssemblies != null)
+            {
+                subAssembly.ChildSubAssemblies = subAssembliesRequest.ChildSubAssemblies; 
+            }
 
             return subAssembly;
         }

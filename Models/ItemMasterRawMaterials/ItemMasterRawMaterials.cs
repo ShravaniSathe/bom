@@ -10,15 +10,15 @@ namespace bom.Models.ItemMasterRawMaterials
     public class ItemMasterRawMaterial : IEntity
     {
         public int Id { get; set; }
-        public int ItemMasterSalesId { get; set; }
-        public string ItemName { get; set; }
-        public string ItemCode { get; set; }
-        public string Grade { get; set; }
-        public string UOM { get; set; }
-        public int Quantity { get; set; }
-        public int Level { get; set; }
-        public string PType { get; set; }
-        public decimal CostPerUnit { get; set; }
-      
+        public int SubAssemblyId { get; set; } 
+        public string ItemName { get; set; } 
+        public string ItemCode { get; set; } 
+        public string Grade { get; set; } 
+        public string UOM { get; set; } 
+        public int Quantity { get; set; } 
+        public int Level { get; set; } 
+        public string PType { get; set; } 
+        public decimal CostPerUnit { get; set; } 
+
     }
 }

@@ -21,23 +21,20 @@ namespace bom.Repositories.BOMStructures.Implementations
             {
                 try
                 {
-                    
-                    const string insertBOMTreeSql = "INSERT INTO dbo.BOMTrees (BOMName) " +
-                                                    "VALUES (@BOMName); " +
+                    const string insertBOMTreeSql = "INSERT INTO dbo.BOMTrees (ItemMasterSalesId) " +
+                                                    "VALUES (@ItemMasterSalesId); " +
                                                     "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var bomId = await db.QuerySingleAsync<int>(insertBOMTreeSql,
-                        new { bomTree.BOMName }, transaction: tran);
+                        new { bomTree.ItemMasterSalesId }, transaction: tran);
 
-                    bomTree.BOMId = bomId;
+                    bomTree.Id = bomId; // Use Id instead of BOMId
 
-                   
                     foreach (var node in bomTree.Nodes)
                     {
-                        await InsertBOMTreeNodeAsync(bomTree.BOMId, node, tran);
+                        await InsertBOMTreeNodeAsync(bomTree.Id, node, tran);
                     }
 
                     CommitTransaction(tran);
-
                     return bomTree;
                 }
                 catch (Exception)
@@ -48,23 +45,26 @@ namespace bom.Repositories.BOMStructures.Implementations
             }
         }
 
-        private async Task InsertBOMTreeNodeAsync(int bomId, BOMTreeNode node, IDbTransaction transaction)
+        private async Task InsertBOMTreeNodeAsync(int bomId, BOMTreeNode node, IDbTransaction transaction, int level = 0)
         {
-            const string insertBOMTreeNodeSql = "INSERT INTO dbo.BOMTreeNodeS (BOMId, Name, ParentId) " +
-                                                "VALUES (@BOMId, @Name, @ParentId); " +
+            const string insertBOMTreeNodeSql = "INSERT INTO dbo.BOMTreeNodes (BOMId, Name, ParentId, Level, NodeType, PType) " +
+                                                "VALUES (@BOMId, @Name, @ParentId, @Level, @NodeType, @PType); " +
                                                 "SELECT CAST(SCOPE_IDENTITY() as int)";
             var nodeId = await db.QuerySingleAsync<int>(insertBOMTreeNodeSql, new
             {
                 BOMId = bomId,
                 node.Name,
-                ParentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value
+                ParentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value,
+                Level = level,
+                NodeType = node.NodeType,
+                PType = node.PType
             }, transaction: transaction);
 
             node.Id = nodeId;
 
             foreach (var child in node.Children)
             {
-                await InsertBOMTreeNodeAsync(bomId, child, transaction);
+                await InsertBOMTreeNodeAsync(bomId, child, transaction, level + 1);
             }
         }
 
@@ -80,16 +80,15 @@ namespace bom.Repositories.BOMStructures.Implementations
 
             if (bomTree != null)
             {
-                
                 var nodeDictionary = nodes.ToDictionary(n => n.Id, n => n);
 
-               
+                // Ensure all nodes have an empty children list initially
                 foreach (var node in nodes)
                 {
                     node.Children = new List<BOMTreeNode>();
                 }
 
-               
+                // Build the tree by linking nodes to their parent
                 foreach (var node in nodes)
                 {
                     if (node.ParentId.HasValue && nodeDictionary.TryGetValue(node.ParentId.Value, out var parentNode))
@@ -98,7 +97,7 @@ namespace bom.Repositories.BOMStructures.Implementations
                     }
                 }
 
-                
+                // The root nodes are those without ParentId
                 bomTree.Nodes = nodes.Where(n => !n.ParentId.HasValue).ToList();
             }
 
@@ -111,20 +110,17 @@ namespace bom.Repositories.BOMStructures.Implementations
             {
                 try
                 {
-                    
-                    const string updateBOMTreeSql = "UPDATE dbo.BOMTrees SET BOMName = @NewBOMName WHERE BOMId = @Id";
+                    const string updateBOMTreeSql = "UPDATE dbo.BOMTrees SET ItemMasterSalesId = @NewItemMasterSalesId WHERE Id = @Id";
                     await db.ExecuteAsync(updateBOMTreeSql,
-                        new { Id = bomTree.BOMId, NewBOMName = bomTree.BOMName },
+                        new { Id = bomTree.Id, NewItemMasterSalesId = bomTree.ItemMasterSalesId },
                         transaction: tran);
 
-                   
                     foreach (var node in bomTree.Nodes)
                     {
                         await UpdateBOMTreeNodeAsync(node, tran);
                     }
 
                     CommitTransaction(tran);
-
                     return bomTree;
                 }
                 catch (Exception)
@@ -137,13 +133,15 @@ namespace bom.Repositories.BOMStructures.Implementations
 
         private async Task UpdateBOMTreeNodeAsync(BOMTreeNode node, IDbTransaction transaction)
         {
-            const string updateBOMTreeNodeSql = "UPDATE dbo.BOMTreeNodes SET Name = @NewName, ParentId = @NewParentId " +
+            const string updateBOMTreeNodeSql = "UPDATE dbo.BOMTreeNodes SET Name = @NewName, ParentId = @NewParentId, NodeType = @NodeType, PType = @PType " +
                                                  "WHERE Id = @Id";
             await db.ExecuteAsync(updateBOMTreeNodeSql, new
             {
                 Id = node.Id,
                 NewName = node.Name,
-                NewParentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value
+                NewParentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value,
+                NodeType = node.NodeType,
+                PType = node.PType
             }, transaction: transaction);
 
             foreach (var child in node.Children)
@@ -155,7 +153,7 @@ namespace bom.Repositories.BOMStructures.Implementations
         public async Task DeleteBOMTreeAsync(int bomId)
         {
             const string deleteBOMTreeNodesSql = "DELETE FROM dbo.BOMTreeNodes WHERE BOMId = @BOMId";
-            const string deleteBOMTreeSql = "DELETE FROM dbo.BOMTrees WHERE BOMId = @BOMId";
+            const string deleteBOMTreeSql = "DELETE FROM dbo.BOMTrees WHERE Id = @BOMId"; // Use Id instead of BOMId
 
             using (var tran = BeginTransaction())
             {

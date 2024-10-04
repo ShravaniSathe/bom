@@ -22,14 +22,18 @@ namespace bom.Repositories.SubAssemblies.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.SubAssemblies (ItemName, UOM, CostPerUnit) " +
-                                       "VALUES (@ItemName, @UOM, @CostPerUnit); " +
+                    const string sql = "INSERT INTO dbo.SubAssemblies (ItemMasterSalesId, ItemName, UOM, CostPerUnit, Level, ParentSubAssemblyId, PType) " +
+                                       "VALUES (@ItemMasterSalesId, @ItemName, @UOM, @CostPerUnit, @Level, @ParentSubAssemblyId, @PType); " +
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
+                        ItemMasterSalesId = subAssembly.ItemMasterSalesId,
                         ItemName = subAssembly.ItemName,
                         UOM = subAssembly.UOM,
-                        CostPerUnit = subAssembly.CostPerUnit
+                        CostPerUnit = subAssembly.CostPerUnit,
+                        Level = subAssembly.Level,
+                        ParentSubAssemblyId = subAssembly.ParentSubAssemblyId,
+                        PType = subAssembly.PType
                     }, transaction: tran);
 
                     subAssembly.Id = id.Single();
@@ -106,9 +110,13 @@ namespace bom.Repositories.SubAssemblies.Implementations
                                                new
                                                {
                                                    SubAssemblyId = subAssembly.Id,
+                                                   NewItemMasterSalesId = subAssembly.ItemMasterSalesId,
                                                    NewItemName = subAssembly.ItemName,
                                                    NewUOM = subAssembly.UOM,
-                                                   NewCostPerUnit = subAssembly.CostPerUnit
+                                                   NewCostPerUnit = subAssembly.CostPerUnit,
+                                                   NewLevel = subAssembly.Level,
+                                                   NewParentSubAssemblyId = subAssembly.ParentSubAssemblyId,
+                                                   NewPType = subAssembly.PType
                                                },
                                                commandType: CommandType.StoredProcedure
                                                ).ConfigureAwait(false);
@@ -121,9 +129,13 @@ namespace bom.Repositories.SubAssemblies.Implementations
             SubAssemblie subAssemblie = new SubAssemblie
             {
                 Id = rawSubAssemblieObject?.Id ?? 0,
+                ItemMasterSalesId = rawSubAssemblieObject?.ItemMasterSalesId ?? 0,
                 ItemName = rawSubAssemblieObject?.ItemName ?? string.Empty,
                 UOM = rawSubAssemblieObject?.UOM ?? string.Empty,
-                CostPerUnit = rawSubAssemblieObject?.CostPerUnit ?? 0
+                CostPerUnit = rawSubAssemblieObject?.CostPerUnit ?? 0,
+                Level = rawSubAssemblieObject?.Level ?? 0,
+                ParentSubAssemblyId = rawSubAssemblieObject?.ParentSubAssemblyId,
+                PType = rawSubAssemblieObject?.PType ?? string.Empty
             };
 
             return subAssemblie;

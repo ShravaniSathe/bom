@@ -94,25 +94,32 @@ namespace bom.API.Controllers
         {
             return new BOMTree
             {
-                BOMId = bomTreeRequest.BOMId,
-                BOMName = bomTreeRequest.BOMName,
-                Nodes = MapNodes(bomTreeRequest.Nodes)
+                Id = bomTreeRequest.BOMId, 
+                ItemMasterSalesId = bomTreeRequest.BOMId, 
+                Nodes = MapNodes(bomTreeRequest.Nodes, null, 0) 
             };
         }
 
-        private List<BOMTreeNode> MapNodes(List<BOMTreeNodeRequestModel> nodeRequests)
+        private List<BOMTreeNode> MapNodes(List<BOMTreeNodeRequestModel> nodeRequests, int? parentId, int level)
         {
             var nodes = new List<BOMTreeNode>();
+
             foreach (var nodeRequest in nodeRequests)
             {
-                nodes.Add(new BOMTreeNode
+                var node = new BOMTreeNode
                 {
                     Id = nodeRequest.Id,
                     Name = nodeRequest.Name,
-                    Children = MapNodes(nodeRequest.Children)
-                });
+                    ParentId = parentId,  
+                    Level = level,        
+                    Children = MapNodes(nodeRequest.Children, nodeRequest.Id, level + 1)
+                };
+
+                nodes.Add(node);
             }
+
             return nodes;
         }
+
     }
 }

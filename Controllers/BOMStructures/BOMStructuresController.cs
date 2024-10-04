@@ -107,8 +107,11 @@ namespace bom.API.Controllers
             {
                 Id = bomStructureRequest.Id,
                 ItemMasterSalesId = bomStructureRequest.ItemMasterSalesId,
-                ParentRawMaterialId = bomStructureRequest.ParentRawMaterialId == 0 ? (int?)null : bomStructureRequest.ParentRawMaterialId,
-                ChildRawMaterialId = bomStructureRequest.ChildRawMaterialId
+                ParentSubAssemblyId = bomStructureRequest.ParentSubAssemblyId,
+                ChildSubAssemblyId = bomStructureRequest.ChildSubAssemblyId,
+                ChildRawMaterialId = bomStructureRequest.ChildRawMaterialId,
+                Level = bomStructureRequest.Level,
+                PType = bomStructureRequest.PType
             };
 
             return bomStructure;
