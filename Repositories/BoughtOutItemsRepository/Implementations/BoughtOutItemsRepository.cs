@@ -20,8 +20,8 @@ namespace bom.Repositories.BoughtOutItems.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.BoughtOutItems (SubAssemblyId, ItemName, UOM, Quantity, CostPerUnit, ProcurementType) " +
-                                       "VALUES (@SubAssemblyId, @ItemName, @UOM, @Quantity, @CostPerUnit, @ProcurementType); " +
+                    const string sql = "INSERT INTO dbo.BoughtOutItems (SubAssemblyId, ItemName, UOM, Quantity, CostPerUnit, PType) " +
+                                       "VALUES (@SubAssemblyId, @ItemName, @UOM, @Quantity, @CostPerUnit, @PType); " +
                                        "SELECT CAST(SCOPE_IDENTITY() as int)";
                     var id = await db.QueryAsync<int>(sql, new
                     {
@@ -30,7 +30,7 @@ namespace bom.Repositories.BoughtOutItems.Implementations
                         UOM = boughtOutItem.UOM,
                         Quantity = boughtOutItem.Quantity,
                         CostPerUnit = boughtOutItem.CostPerUnit,
-                        ProcurementType = boughtOutItem.ProcurementType // Added to match model
+                        ProcurementType = boughtOutItem.PType // Added to match model
                     }, transaction: tran);
 
                     boughtOutItem.Id = id.Single();
@@ -89,7 +89,7 @@ namespace bom.Repositories.BoughtOutItems.Implementations
                                       NewUOM = boughtOutItem.UOM,
                                       NewQuantity = boughtOutItem.Quantity,
                                       NewCostPerUnit = boughtOutItem.CostPerUnit,
-                                      NewProcurementType = boughtOutItem.ProcurementType
+                                      NewPType = boughtOutItem.PType
                                   },
                                   commandType: CommandType.StoredProcedure
                                   ).ConfigureAwait(false);
@@ -117,7 +117,7 @@ namespace bom.Repositories.BoughtOutItems.Implementations
                 UOM = result?.UOM ?? string.Empty,
                 Quantity = result?.Quantity ?? 0,
                 CostPerUnit = result?.CostPerUnit ?? 0,
-                ProcurementType = result?.ProcurementType ?? "BoughtOut"
+                PType = result?.ProcurementType ?? "BoughtOut"
             };
 
             return boughtOutItem;

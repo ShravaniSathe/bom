@@ -110,7 +110,7 @@ namespace bom.API.Controllers
                 UOM = boughtOutItemsRequest.UOM,
                 Quantity = boughtOutItemsRequest.Quantity,
                 CostPerUnit = boughtOutItemsRequest.CostPerUnit,
-                ProcurementType = boughtOutItemsRequest.PType 
+                PType = boughtOutItemsRequest.PType 
             };
 
             return boughtOutItem;

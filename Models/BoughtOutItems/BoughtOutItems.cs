@@ -16,6 +16,6 @@ namespace bom.Models.BoughtOutItems
         public string UOM { get; set; } 
         public int Quantity { get; set; } 
         public decimal CostPerUnit { get; set; } 
-        public string ProcurementType { get; set; } = "BoughtOut"; 
+        public string PType { get; set; } = "BoughtOut"; 
     }
 }

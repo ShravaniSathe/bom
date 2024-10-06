@@ -94,8 +94,8 @@ namespace bom.API.Controllers
         {
             return new BOMTree
             {
-                Id = bomTreeRequest.BOMId, 
-                ItemMasterSalesId = bomTreeRequest.BOMId, 
+                Id = bomTreeRequest.Id, 
+                ItemMasterSalesId = bomTreeRequest.ItemMasterSalesId, 
                 Nodes = MapNodes(bomTreeRequest.Nodes, null, 0) 
             };
         }
@@ -109,6 +109,7 @@ namespace bom.API.Controllers
                 var node = new BOMTreeNode
                 {
                     Id = nodeRequest.Id,
+                    BOMId = nodeRequest.BOMId,
                     Name = nodeRequest.Name,
                     ParentId = parentId,  
                     Level = level,        

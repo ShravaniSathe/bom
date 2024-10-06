@@ -18,6 +18,7 @@ using System.Threading.Tasks;
     public class BOMTreeNode : IEntity
     {
         public int Id { get; set; }
+        public int BOMId { get; set; }
         public string Name { get; set; }
         public int? ParentId { get; set; }
         public int Level { get; set; }
