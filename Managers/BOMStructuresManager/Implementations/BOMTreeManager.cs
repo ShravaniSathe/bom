@@ -31,7 +31,7 @@ namespace bom.Managers.BOMStructures
 
         public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
         {
-            var existingBOMTree = await _bomTreeRepository.GetBOMTreeByIdAsync(bomTree.BOMId);
+            var existingBOMTree = await _bomTreeRepository.GetBOMTreeByIdAsync(bomTree.Id);
             if (existingBOMTree == null)
             {
                 return null; 

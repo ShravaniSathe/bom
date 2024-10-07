@@ -22,10 +22,15 @@ namespace bom.Repositories.SubAssemblies.Implementations
             {
                 try
                 {
-                    const string sql = "INSERT INTO dbo.SubAssemblies (ItemMasterSalesId, ItemName, UOM, CostPerUnit, Level, ParentSubAssemblyId, PType) " +
-                                       "VALUES (@ItemMasterSalesId, @ItemName, @UOM, @CostPerUnit, @Level, @ParentSubAssemblyId, @PType); " +
-                                       "SELECT CAST(SCOPE_IDENTITY() as int)";
-                    var id = await db.QueryAsync<int>(sql, new
+                    // Insert the SubAssemblie first
+                    const string insertSubAssemblieSql = @"
+                INSERT INTO dbo.SubAssemblies 
+                    (ItemMasterSalesId, ItemName, UOM, CostPerUnit, Level, ParentSubAssemblyId, PType) 
+                VALUES 
+                    (@ItemMasterSalesId, @ItemName, @UOM, @CostPerUnit, @Level, @ParentSubAssemblyId, @PType); 
+                SELECT CAST(SCOPE_IDENTITY() as int)";
+
+                    var id = await db.QueryAsync<int>(insertSubAssemblieSql, new
                     {
                         ItemMasterSalesId = subAssembly.ItemMasterSalesId,
                         ItemName = subAssembly.ItemName,
@@ -36,19 +41,123 @@ namespace bom.Repositories.SubAssemblies.Implementations
                         PType = subAssembly.PType
                     }, transaction: tran);
 
+                    // Set the generated SubAssembly ID
                     subAssembly.Id = id.Single();
 
-                    CommitTransaction(tran);
+                    // Insert RawMaterials for the SubAssembly
+                    if (subAssembly.RawMaterials != null && subAssembly.RawMaterials.Any())
+                    {
+                        const string insertRawMaterialSql = @"
+                    INSERT INTO dbo.ItemMasterRawMaterials
+                        (SubAssemblyId, ItemName, ItemCode, Grade, UOM, Quantity, Level, PType, CostPerUnit)
+                    VALUES
+                        (@SubAssemblyId, @ItemName, @ItemCode, @Grade, @UOM, @Quantity, @Level, @PType, @CostPerUnit);";
 
+                        foreach (var rawMaterial in subAssembly.RawMaterials)
+                        {
+                            rawMaterial.SubAssemblyId = subAssembly.Id; // Set the correct SubAssemblyId for each raw material
+
+                            await db.ExecuteAsync(insertRawMaterialSql, new
+                            {
+                                SubAssemblyId = rawMaterial.SubAssemblyId,
+                                ItemName = rawMaterial.ItemName,
+                                ItemCode = rawMaterial.ItemCode,
+                                Grade = rawMaterial.Grade,
+                                UOM = rawMaterial.UOM,
+                                Quantity = rawMaterial.Quantity,
+                                Level = rawMaterial.Level,
+                                PType = rawMaterial.PType,
+                                CostPerUnit = rawMaterial.CostPerUnit
+                            }, transaction: tran);
+                        }
+                    }
+
+                    // Insert Child SubAssemblies (if any)
+                    if (subAssembly.ChildSubAssemblies != null && subAssembly.ChildSubAssemblies.Any())
+                    {
+                        foreach (var childSubAssembly in subAssembly.ChildSubAssemblies)
+                        {
+                            childSubAssembly.ParentSubAssemblyId = subAssembly.Id; // Set the parent subassembly ID
+                            await AddSubAssemblyRecursiveAsync(childSubAssembly, tran);  // Recursive call to insert child subassembly with the same transaction
+                        }
+                    }
+
+                    CommitTransaction(tran);
                     return subAssembly;
                 }
                 catch (Exception)
                 {
                     RollbackTransaction(tran);
-                    throw;
+                    throw; // Rethrow the exception to propagate the error
                 }
             }
         }
+
+        private async Task AddSubAssemblyRecursiveAsync(SubAssemblie subAssembly, IDbTransaction tran)
+        {
+            // Insert the SubAssemblie
+            const string insertSubAssemblieSql = @"
+        INSERT INTO dbo.SubAssemblies 
+            (ItemMasterSalesId, ItemName, UOM, CostPerUnit, Level, ParentSubAssemblyId, PType) 
+        VALUES 
+            (@ItemMasterSalesId, @ItemName, @UOM, @CostPerUnit, @Level, @ParentSubAssemblyId, @PType); 
+        SELECT CAST(SCOPE_IDENTITY() as int)";
+
+            var id = await db.QueryAsync<int>(insertSubAssemblieSql, new
+            {
+                ItemMasterSalesId = subAssembly.ItemMasterSalesId,
+                ItemName = subAssembly.ItemName,
+                UOM = subAssembly.UOM,
+                CostPerUnit = subAssembly.CostPerUnit,
+                Level = subAssembly.Level,
+                ParentSubAssemblyId = subAssembly.ParentSubAssemblyId,
+                PType = subAssembly.PType
+            }, transaction: tran);
+
+            // Set the generated SubAssembly ID
+            subAssembly.Id = id.Single();
+
+            // Insert RawMaterials for the SubAssembly
+            if (subAssembly.RawMaterials != null && subAssembly.RawMaterials.Any())
+            {
+                const string insertRawMaterialSql = @"
+            INSERT INTO dbo.ItemMasterRawMaterials
+                (SubAssemblyId, ItemName, ItemCode, Grade, UOM, Quantity, Level, PType, CostPerUnit)
+            VALUES
+                (@SubAssemblyId, @ItemName, @ItemCode, @Grade, @UOM, @Quantity, @Level, @PType, @CostPerUnit);";
+
+                foreach (var rawMaterial in subAssembly.RawMaterials)
+                {
+                    rawMaterial.SubAssemblyId = subAssembly.Id; // Set the correct SubAssemblyId for each raw material
+
+                    await db.ExecuteAsync(insertRawMaterialSql, new
+                    {
+                        SubAssemblyId = rawMaterial.SubAssemblyId,
+                        ItemName = rawMaterial.ItemName,
+                        ItemCode = rawMaterial.ItemCode,
+                        Grade = rawMaterial.Grade,
+                        UOM = rawMaterial.UOM,
+                        Quantity = rawMaterial.Quantity,
+                        Level = rawMaterial.Level,
+                        PType = rawMaterial.PType,
+                        CostPerUnit = rawMaterial.CostPerUnit
+                    }, transaction: tran);
+                }
+            }
+
+            // Insert Child SubAssemblies (if any)
+            if (subAssembly.ChildSubAssemblies != null && subAssembly.ChildSubAssemblies.Any())
+            {
+                foreach (var childSubAssembly in subAssembly.ChildSubAssemblies)
+                {
+                    childSubAssembly.ParentSubAssemblyId = subAssembly.Id; // Set the parent subassembly ID for the child
+                    await AddSubAssemblyRecursiveAsync(childSubAssembly, tran);  // Recursive call for child subassemblies
+                }
+            }
+        }
+
+
+
 
         public async Task<bool> DeleteSubAssemblyAsync(int id)
         {
