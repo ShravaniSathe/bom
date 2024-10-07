@@ -69,9 +69,11 @@ namespace bom.Managers.Search.Implementations
             {
                 Id = b.Id,
                 ItemName = b.ItemName,
-                ItemCode = b.ItemCode,
+                SubAssemblyId = b.SubAssemblyId,
                 UOM = b.UOM,
-                Quantity = b.Quantity
+                Quantity = b.Quantity,
+                CostPerUnit = b.CostPerUnit,
+                PType = b.PType
             });
         }
     }
