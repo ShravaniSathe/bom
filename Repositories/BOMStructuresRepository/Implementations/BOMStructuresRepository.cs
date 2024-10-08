@@ -113,10 +113,10 @@ namespace bom.Repositories.BOMStructures.Implementations
         {
             BOMStructure bomStructure = new BOMStructure();
             bomStructure.Id = result.ID;
-            bomStructure.ItemMasterSalesId = result.ItemMasterSalesId;
+            bomStructure.ItemMasterSalesId = result.ItemMasterSalesID;
             bomStructure.ParentSubAssemblyId = result?.ParentSubAssemblyId;
             bomStructure.ChildSubAssemblyId = result?.ChildSubAssemblyId;
-            bomStructure.ChildRawMaterialId = result.ChildRawMaterialId;
+            bomStructure.ChildRawMaterialId = result.ChildRawMaterialID;
             bomStructure.Level = result.Level;
             bomStructure.PType = result.PType;
 

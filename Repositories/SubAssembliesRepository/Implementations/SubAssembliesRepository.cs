@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using bom.Models.ItemMasterRawMaterials;
 using bom.Models.SubAssemblies;
 using bom.Repositories.SubAssemblies.Abstractions;
 using Dapper;
@@ -235,9 +236,10 @@ namespace bom.Repositories.SubAssemblies.Implementations
 
         private async Task<SubAssemblie> GetSubAssemblieObjectFromResult(dynamic rawSubAssemblieObject)
         {
+            // Create the main SubAssemblie object
             SubAssemblie subAssemblie = new SubAssemblie
             {
-                Id = rawSubAssemblieObject?.Id ?? 0,
+                Id = rawSubAssemblieObject?.ID ?? 0,
                 ItemMasterSalesId = rawSubAssemblieObject?.ItemMasterSalesId ?? 0,
                 ItemName = rawSubAssemblieObject?.ItemName ?? string.Empty,
                 UOM = rawSubAssemblieObject?.UOM ?? string.Empty,
@@ -247,7 +249,35 @@ namespace bom.Repositories.SubAssemblies.Implementations
                 PType = rawSubAssemblieObject?.PType ?? string.Empty
             };
 
+            // Fetch Raw Materials for the SubAssemblie
+            const string selectRawMaterialsSql = @"
+        SELECT * FROM dbo.ItemMasterRawMaterials
+        WHERE SubAssemblyId = @SubAssemblyId";
+
+            var rawMaterials = await db.QueryAsync<ItemMasterRawMaterial>(selectRawMaterialsSql, new { SubAssemblyId = subAssemblie.Id });
+            subAssemblie.RawMaterials = rawMaterials?.ToList() ?? new List<ItemMasterRawMaterial>();
+
+            // Fetch Child SubAssemblies (if any)
+            const string selectChildSubAssembliesSql = @"
+        SELECT * FROM dbo.SubAssemblies
+        WHERE ParentSubAssemblyId = @ParentSubAssemblyId";
+
+            var childSubAssemblies = await db.QueryAsync(selectChildSubAssembliesSql, new { ParentSubAssemblyId = subAssemblie.Id });
+
+            if (childSubAssemblies != null && childSubAssemblies.Any())
+            {
+                subAssemblie.ChildSubAssemblies = new List<SubAssemblie>();
+
+                foreach (var childSubAssembly in childSubAssemblies)
+                {
+                    // Recursively get the child subassemblies
+                    var child = await GetSubAssemblieObjectFromResult(childSubAssembly);
+                    subAssemblie.ChildSubAssemblies.Add(child);
+                }
+            }
+
             return subAssemblie;
         }
+
     }
 }

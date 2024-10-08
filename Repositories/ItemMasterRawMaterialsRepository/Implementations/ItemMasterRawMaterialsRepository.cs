@@ -73,7 +73,7 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
             var itemMasterRawMaterialsList = new List<ItemMasterRawMaterial>();
             foreach (var item in retVal)
             {
-                ItemMasterRawMaterial itemMasterRawMaterial = await GetItemMasterRawMaterialObjectFromResult(item);
+                ItemMasterRawMaterial itemMasterRawMaterial =  GetItemMasterRawMaterialObjectFromResult(item);
                 itemMasterRawMaterialsList.Add(itemMasterRawMaterial);
             }
 
@@ -118,7 +118,7 @@ namespace bom.Repositories.ItemMasterRawMaterials.Implementations
 
             return new ItemMasterRawMaterial
             {
-                Id = result.Id,
+                Id = result.ID,
                 SubAssemblyId = result.SubAssemblyId,
                 ItemName = result.ItemName,
                 ItemCode = result.ItemCode,

@@ -21,6 +21,7 @@ namespace bom.Repositories.BOMStructures.Implementations
             {
                 try
                 {
+                    // Insert BOMTree and get its Id
                     const string insertBOMTreeSql = "INSERT INTO dbo.BOMTrees (ItemMasterSalesId) " +
                                                     "VALUES (@ItemMasterSalesId); " +
                                                     "SELECT CAST(SCOPE_IDENTITY() as int)";
@@ -29,8 +30,10 @@ namespace bom.Repositories.BOMStructures.Implementations
 
                     bomTree.Id = bomId; // Use Id instead of BOMId
 
+                    // Insert nodes and update their Ids
                     foreach (var node in bomTree.Nodes)
                     {
+                        // Insert the parent node
                         await InsertBOMTreeNodeAsync(bomTree.Id, node, tran);
                     }
 
@@ -47,26 +50,35 @@ namespace bom.Repositories.BOMStructures.Implementations
 
         private async Task InsertBOMTreeNodeAsync(int bomId, BOMTreeNode node, IDbTransaction transaction, int level = 0)
         {
+            // Insert the node into BOMTreeNodes and get its Id
             const string insertBOMTreeNodeSql = "INSERT INTO dbo.BOMTreeNodes (BOMId, Name, ParentId, Level, NodeType, PType) " +
                                                 "VALUES (@BOMId, @Name, @ParentId, @Level, @NodeType, @PType); " +
                                                 "SELECT CAST(SCOPE_IDENTITY() as int)";
+
+            // Use ParentId as null for the root node initially, or update as necessary for children
+            var parentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value;
+
             var nodeId = await db.QuerySingleAsync<int>(insertBOMTreeNodeSql, new
             {
                 BOMId = bomId,
-                node.Name,
-                ParentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value,
+                Name = node.Name,
+                ParentId = parentId,
                 Level = level,
                 NodeType = node.NodeType,
                 PType = node.PType
             }, transaction: transaction);
 
-            node.Id = nodeId;
+            node.Id = nodeId; // Set the Id of the current node
 
+            // If this node has children, set their ParentId to the newly created node's Id
             foreach (var child in node.Children)
             {
+                // Update the child's ParentId to the current node's Id
+                child.ParentId = nodeId; // Update parentId for child before inserting
                 await InsertBOMTreeNodeAsync(bomId, child, transaction, level + 1);
             }
         }
+
 
         public async Task<BOMTree> GetBOMTreeByIdAsync(int bomId)
         {

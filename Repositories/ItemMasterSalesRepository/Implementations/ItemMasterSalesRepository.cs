@@ -136,7 +136,7 @@ namespace bom.Repositories.ItemMasterSales.Implementations
             ItemMasterSale itemMasterSale = new ItemMasterSale();
 
 
-                itemMasterSale.Id = rawItemMasterSaleObject?.Id ?? 0;
+                itemMasterSale.Id = rawItemMasterSaleObject?.ID ?? 0;
                 itemMasterSale.ItemName = rawItemMasterSaleObject?.ItemName ?? string.Empty;
                 itemMasterSale.ItemCode = rawItemMasterSaleObject?.ItemCode ?? string.Empty;
                 itemMasterSale.Grade = rawItemMasterSaleObject?.Grade ?? string.Empty;
