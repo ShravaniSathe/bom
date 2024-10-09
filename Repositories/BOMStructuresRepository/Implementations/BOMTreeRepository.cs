@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using bom.Models.BOMStructure;
+using bom.Models.ItemMasterRawMaterials;
+using bom.Models.SubAssemblies;
 using bom.Repositories.BOMStructures.Abstractions;
 
 namespace bom.Repositories.BOMStructures.Implementations
@@ -85,10 +87,12 @@ namespace bom.Repositories.BOMStructures.Implementations
             const string storedProcedureName = "sp_GetBOMTreeById";
 
             var result = await db.QueryMultipleAsync(storedProcedureName,
-                new { BOMId = bomId }, commandType: CommandType.StoredProcedure);
+                new { Id = bomId }, commandType: CommandType.StoredProcedure);
 
             var bomTree = result.Read<BOMTree>().SingleOrDefault();
             var nodes = result.Read<BOMTreeNode>().ToList();
+            var subAssemblies = result.Read<SubAssemblie>().ToList(); // Assuming SubAssembly is defined
+            var rawMaterials = result.Read<ItemMasterRawMaterial>().ToList(); // Assuming RawMaterial is defined
 
             if (bomTree != null)
             {
@@ -111,10 +115,22 @@ namespace bom.Repositories.BOMStructures.Implementations
 
                 // The root nodes are those without ParentId
                 bomTree.Nodes = nodes.Where(n => !n.ParentId.HasValue).ToList();
+
+                // Populate SubAssemblies and RawMaterials for BOMTree
+                bomTree.SubAssemblies = subAssemblies;
+                bomTree.RawMaterials = rawMaterials;
+
+                // Populate RawMaterials in each SubAssembly
+                foreach (var subAssembly in bomTree.SubAssemblies)
+                {
+                    subAssembly.RawMaterials = rawMaterials
+                        .Where(r => r.SubAssemblyId == subAssembly.Id).ToList(); // Assuming a link back to sub assemblies
+                }
             }
 
             return bomTree;
         }
+
 
         public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
         {

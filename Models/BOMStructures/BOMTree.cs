@@ -1,4 +1,6 @@
 ﻿using bom.Models.ItemMasterSales;
+using bom.Models.ItemMasterRawMaterials;
+using bom.Models.SubAssemblies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,8 @@ using System.Threading.Tasks;
         public int ItemMasterSalesId { get; set; }
         public ItemMasterSale ItemMasterSales { get; set; }
         public List<BOMTreeNode> Nodes { get; set; } = new List<BOMTreeNode>();
+        public List<SubAssemblie> SubAssemblies { get; set; } = new List<SubAssemblie>(); 
+        public List<ItemMasterRawMaterial> RawMaterials { get; set; } = new List<ItemMasterRawMaterial>();
     }
 
     public class BOMTreeNode : IEntity

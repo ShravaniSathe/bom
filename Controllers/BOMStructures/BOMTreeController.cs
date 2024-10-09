@@ -112,7 +112,9 @@ namespace bom.API.Controllers
                     BOMId = nodeRequest.BOMId,
                     Name = nodeRequest.Name,
                     ParentId = parentId,  
-                    Level = level,        
+                    Level = level,
+                    NodeType = nodeRequest.NodeType,
+                    PType = nodeRequest.PType,
                     Children = MapNodes(nodeRequest.Children, nodeRequest.Id, level + 1)
                 };
 
