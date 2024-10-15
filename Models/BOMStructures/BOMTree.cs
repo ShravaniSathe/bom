@@ -29,6 +29,7 @@ using System.Threading.Tasks;
         public List<BOMTreeNode> Children { get; set; } = new List<BOMTreeNode>();
         public string NodeType { get; set; } 
         public string PType { get; set; }
+        public List<SubAssemblie> SubAssemblies { get; internal set; }
     }
 
 

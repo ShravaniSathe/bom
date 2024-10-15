@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dapper;
 using bom.Models.BOMStructure;
 using bom.Models.ItemMasterRawMaterials;
+using bom.Models.ItemMasterSales;
 using bom.Models.SubAssemblies;
 using bom.Repositories.BOMStructures.Abstractions;
 
@@ -30,12 +31,16 @@ namespace bom.Repositories.BOMStructures.Implementations
                     var bomId = await db.QuerySingleAsync<int>(insertBOMTreeSql,
                         new { bomTree.ItemMasterSalesId }, transaction: tran);
 
-                    bomTree.Id = bomId; // Use Id instead of BOMId
+                    bomTree.Id = bomId;
 
-                    // Insert nodes and update their Ids
+                    // Insert top-level nodes (like Seats and Engine)
                     foreach (var node in bomTree.Nodes)
                     {
-                        // Insert the parent node
+                        // For the top-level nodes, set ParentId to the ItemMasterSalesId
+                        node.ParentId = bomTree.ItemMasterSalesId;
+                        node.Level = 1; // Root nodes are at level 1
+
+                        // Insert the top-level node and its children
                         await InsertBOMTreeNodeAsync(bomTree.Id, node, tran);
                     }
 
@@ -50,34 +55,39 @@ namespace bom.Repositories.BOMStructures.Implementations
             }
         }
 
-        private async Task InsertBOMTreeNodeAsync(int bomId, BOMTreeNode node, IDbTransaction transaction, int level = 0)
+        private async Task InsertBOMTreeNodeAsync(int bomId, BOMTreeNode node, IDbTransaction transaction)
         {
-            // Insert the node into BOMTreeNodes and get its Id
-            const string insertBOMTreeNodeSql = "INSERT INTO dbo.BOMTreeNodes (BOMId, Name, ParentId, Level, NodeType, PType) " +
-                                                "VALUES (@BOMId, @Name, @ParentId, @Level, @NodeType, @PType); " +
-                                                "SELECT CAST(SCOPE_IDENTITY() as int)";
+            // If ParentId is 0 or not set, use DBNull.Value or null
+            var parentIdValue = node.ParentId != 0 ? (object)node.ParentId : DBNull.Value;
 
-            // Use ParentId as null for the root node initially, or update as necessary for children
-            var parentId = node.ParentId.HasValue ? (object)node.ParentId.Value : DBNull.Value;
+            const string insertBOMTreeNodeSql = @"
+        INSERT INTO dbo.BOMTreeNodes (BOMId, Name, ParentId, Level, NodeType, PType) 
+        VALUES (@BOMId, @Name, @ParentId, @Level, @NodeType, @PType); 
+        SELECT CAST(SCOPE_IDENTITY() as int)";
 
+            // Insert the current node and get its Id
             var nodeId = await db.QuerySingleAsync<int>(insertBOMTreeNodeSql, new
             {
                 BOMId = bomId,
                 Name = node.Name,
-                ParentId = parentId,
-                Level = level,
+                ParentId = parentIdValue,  // If ParentId is 0, it will be DBNull.Value (for top-level nodes)
+                Level = node.Level,
                 NodeType = node.NodeType,
                 PType = node.PType
             }, transaction: transaction);
 
-            node.Id = nodeId; // Set the Id of the current node
+            // Set the newly inserted node's Id
+            node.Id = nodeId;
 
-            // If this node has children, set their ParentId to the newly created node's Id
+            // Insert child nodes, if any
             foreach (var child in node.Children)
             {
-                // Update the child's ParentId to the current node's Id
-                child.ParentId = nodeId; // Update parentId for child before inserting
-                await InsertBOMTreeNodeAsync(bomId, child, transaction, level + 1);
+                // Set the child's ParentId to the newly inserted node's Id
+                child.ParentId = node.Id;
+                child.Level = node.Level + 1; // Increment the level for the child
+
+                // Recursively insert child nodes
+                await InsertBOMTreeNodeAsync(bomId, child, transaction);
             }
         }
 
@@ -86,51 +96,68 @@ namespace bom.Repositories.BOMStructures.Implementations
         {
             const string storedProcedureName = "sp_GetBOMTreeById";
 
+            // Execute the stored procedure to get multiple result sets
             var result = await db.QueryMultipleAsync(storedProcedureName,
                 new { Id = bomId }, commandType: CommandType.StoredProcedure);
 
+            // 1. Read and map the BOMTree object
             var bomTree = result.Read<BOMTree>().SingleOrDefault();
+            var itemMasterSales = result.Read<ItemMasterSale>().SingleOrDefault();
             var nodes = result.Read<BOMTreeNode>().ToList();
-            var subAssemblies = result.Read<SubAssemblie>().ToList(); // Assuming SubAssembly is defined
-            var rawMaterials = result.Read<ItemMasterRawMaterial>().ToList(); // Assuming RawMaterial is defined
+            var subAssemblies = result.Read<SubAssemblie>().ToList();
+            var rawMaterials = result.Read<ItemMasterRawMaterial>().ToList();
 
             if (bomTree != null)
             {
-                var nodeDictionary = nodes.ToDictionary(n => n.Id, n => n);
+                // Attach ItemMasterSales to the BOMTree object
+                bomTree.ItemMasterSales = itemMasterSales;
 
-                // Ensure all nodes have an empty children list initially
+                // 2. Create a dictionary to map nodes by their ID (to facilitate parent-child relationships)
+                var nodeDictionary = nodes.ToDictionary(n => n.Id);
+
+                // 3. Initialize empty lists for node children and sub-assemblies
                 foreach (var node in nodes)
                 {
                     node.Children = new List<BOMTreeNode>();
+                    node.SubAssemblies = new List<SubAssemblie>();
                 }
 
-                // Build the tree by linking nodes to their parent
+                // 4. Establish parent-child relationships among nodes
                 foreach (var node in nodes)
                 {
                     if (node.ParentId.HasValue && nodeDictionary.TryGetValue(node.ParentId.Value, out var parentNode))
                     {
-                        parentNode.Children.Add(node);
+                        parentNode.Children.Add(node);  // Add the node as a child of its parent
                     }
                 }
 
-                // The root nodes are those without ParentId
+                // 5. Get top-level nodes (without ParentId) and assign to BOMTree
                 bomTree.Nodes = nodes.Where(n => !n.ParentId.HasValue).ToList();
 
-                // Populate SubAssemblies and RawMaterials for BOMTree
-                bomTree.SubAssemblies = subAssemblies;
-                bomTree.RawMaterials = rawMaterials;
-
-                // Populate RawMaterials in each SubAssembly
-                foreach (var subAssembly in bomTree.SubAssemblies)
+                // 6. Attach sub-assemblies to their respective nodes
+                foreach (var subAssembly in subAssemblies)
                 {
-                    subAssembly.RawMaterials = rawMaterials
-                        .Where(r => r.SubAssemblyId == subAssembly.Id).ToList(); // Assuming a link back to sub assemblies
+                    // Find the parent node (based on ItemMasterSalesId) and add the sub-assembly
+                    if (nodeDictionary.TryGetValue((int)subAssembly.ParentSubAssemblyId, out var parentNode))
+                    {
+                        parentNode.SubAssemblies.Add(subAssembly);
+                    }
+                }
+
+                // 7. Attach raw materials to their respective sub-assemblies
+                foreach (var rawMaterial in rawMaterials)
+                {
+                    var parentSubAssembly = subAssemblies.FirstOrDefault(sa => sa.Id == rawMaterial.SubAssemblyId);
+                    if (parentSubAssembly != null)
+                    {
+                        parentSubAssembly.RawMaterials ??= new List<ItemMasterRawMaterial>();
+                        parentSubAssembly.RawMaterials.Add(rawMaterial);
+                    }
                 }
             }
 
             return bomTree;
         }
-
 
         public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
         {
