@@ -99,65 +99,66 @@ namespace bom.Repositories.BOMStructures.Implementations
         public async Task<BOMTree> GetBOMTreeByIdAsync(int bomTreeId)
         {
             const string bomTreeSql = @"
-            SELECT 
-                bt.Id,
-                bt.ItemMasterSalesId,
-                ims.ID, ims.ItemName, ims.ItemCode, ims.Grade, ims.UOM, ims.Quantity, ims.Level, ims.PType, ims.CreatedDate
-            FROM 
-                dbo.BOMTrees bt
-            INNER JOIN 
-                dbo.ItemMasterSales ims ON bt.ItemMasterSalesId = ims.ID
-            WHERE 
-                bt.Id = @BOMTreeId;
+             SELECT 
+             bt.Id,
+             bt.ItemMasterSalesId,
+             ims.ID, ims.ItemName, ims.ItemCode, ims.Grade, ims.UOM, ims.Quantity, ims.Level, ims.PType, ims.CreatedDate
+             FROM 
+             dbo.BOMTrees bt
+             INNER JOIN 
+             dbo.ItemMasterSales ims ON bt.ItemMasterSalesId = ims.ID
+             WHERE 
+             bt.Id = @BOMTreeId;
             ";
 
             const string subAssembliesSql = @"
-            SELECT 
-                sa.ID,
-                sa.ItemName,
-                sa.UOM,
-                sa.CostPerUnit,
-                sa.ItemMasterSalesId,
-                sa.Level,
-                sa.ParentSubAssemblyId,
-                sa.PType
-            FROM 
-                dbo.SubAssemblies sa
-            WHERE 
-                sa.ItemMasterSalesId = @ItemMasterSalesId;
+             SELECT 
+             sa.ID,
+             sa.ItemName,
+             sa.UOM,
+             sa.CostPerUnit,
+             sa.ItemMasterSalesId,
+             sa.Level,
+             sa.ParentSubAssemblyId,
+             sa.PType,
+             sa.Quantity
+             FROM 
+             dbo.SubAssemblies sa
+             WHERE 
+             sa.ItemMasterSalesId = @ItemMasterSalesId;
             ";
 
             const string rawMaterialsSql = @"
-            SELECT 
-                rm.ID,
-                rm.SubAssemblyId,
-                rm.ItemName,
-                rm.ItemCode,
-                rm.Grade,
-                rm.UOM,
-                rm.Quantity,
-                rm.Level,
-                rm.PType,
-                rm.CostPerUnit
-            FROM 
-                dbo.ItemMasterRawMaterials rm
-            WHERE 
-                rm.SubAssemblyId IN (SELECT ID FROM dbo.SubAssemblies WHERE ItemMasterSalesId = @ItemMasterSalesId);
+             SELECT 
+             rm.ID,
+             rm.SubAssemblyId,
+             rm.ItemName,
+             rm.ItemCode,
+             rm.Grade,
+             rm.UOM,
+             rm.Quantity,
+             rm.Level,
+             rm.PType,
+             rm.CostPerUnit
+             FROM 
+             dbo.ItemMasterRawMaterials rm
+             WHERE 
+             rm.SubAssemblyId IN (SELECT ID FROM dbo.SubAssemblies WHERE ItemMasterSalesId = @ItemMasterSalesId);
             ";
 
             const string bomTreeNodesSql = @"
-            SELECT 
-                btn.Id,
-                btn.Name,
-                btn.ParentId,
-                btn.Level,
-                btn.NodeType,
-                btn.PType,
-                btn.BOMId
-            FROM 
-                dbo.BOMTreeNodes btn
-            WHERE 
-                btn.BOMId = @BOMTreeId;
+             SELECT 
+             btn.Id,
+             btn.Name,
+             btn.ParentId,
+             btn.Level,
+             btn.NodeType,
+             btn.PType,
+             btn.BOMId
+             FROM 
+             dbo.BOMTreeNodes btn
+             WHERE 
+             btn.BOMId = @BOMTreeId;
             ";
 
             // Step 1: Retrieve BOMTree and ItemMasterSales
@@ -188,12 +189,11 @@ namespace bom.Repositories.BOMStructures.Implementations
             var bomTreeNodes = await _dbConnection.QueryAsync<BOMTreeNode>(bomTreeNodesSql,
                 new { BOMTreeId = bomTree.Id });
 
-            // Map the nodes, subassemblies, and raw materials to form the hierarchical structure
+            // Step 5: Create dictionaries for fast lookup
             var nodeDictionary = bomTreeNodes.ToDictionary(n => n.Id, n => n);
             var subAssemblyDictionary = subAssemblies.ToDictionary(sa => sa.Id, sa => sa);
-            var rawMaterialDictionary = rawMaterials.ToDictionary(rm => rm.Id, rm => rm);
 
-            // Step 5: Build the hierarchy for SubAssemblies
+            // Step 6: Build the hierarchy for SubAssemblies
             foreach (var subAssembly in subAssemblies)
             {
                 if (subAssembly.ParentSubAssemblyId == null)
@@ -209,17 +209,25 @@ namespace bom.Repositories.BOMStructures.Implementations
                 }
             }
 
-            // Step 6: Map Raw Materials to corresponding SubAssemblies
+            // Step 7: Build the hierarchy for RawMaterials (updated logic)
             foreach (var rawMaterial in rawMaterials)
             {
                 if (subAssemblyDictionary.ContainsKey(rawMaterial.SubAssemblyId))
                 {
+                    // If the raw material belongs to a sub-assembly, add it to that sub-assembly
                     var subAssembly = subAssemblyDictionary[rawMaterial.SubAssemblyId];
+                    subAssembly.RawMaterials ??= new List<ItemMasterRawMaterial>();
                     subAssembly.RawMaterials.Add(rawMaterial);
+                }
+                else
+                {
+                    // If it doesn't belong to any sub-assembly, add it as a top-level raw material in ItemMasterSales
+                    bomTree.RawMaterials.Add(rawMaterial);
                 }
             }
 
-            // Step 7: Build BOM Tree Nodes hierarchy
+
+            // Step 8: Build BOM Tree Nodes hierarchy
             foreach (var node in bomTreeNodes)
             {
                 if (node.ParentId == bomTree.ItemMasterSalesId)
@@ -236,10 +244,8 @@ namespace bom.Repositories.BOMStructures.Implementations
 
             return bomTree;
         }
-    
 
-
-    public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
+        public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
         {
             using (var tran = BeginTransaction())
             {
