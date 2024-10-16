@@ -9,13 +9,17 @@ using bom.Models.ItemMasterRawMaterials;
 using bom.Models.ItemMasterSales;
 using bom.Models.SubAssemblies;
 using bom.Repositories.BOMStructures.Abstractions;
+using System.Data.SqlClient;
 
 namespace bom.Repositories.BOMStructures.Implementations
 {
     public class BOMTreeRepository : Repository<BOMTree>, IBOMTreeRepository
     {
+        private readonly IDbConnection _dbConnection;
+
         public BOMTreeRepository(string connectionString) : base(connectionString)
         {
+            _dbConnection = new SqlConnection(connectionString);
         }
 
         public async Task<BOMTree> CreateBOMTreeAsync(BOMTree bomTree)
@@ -92,74 +96,150 @@ namespace bom.Repositories.BOMStructures.Implementations
         }
 
 
-        public async Task<BOMTree> GetBOMTreeByIdAsync(int bomId)
+        public async Task<BOMTree> GetBOMTreeByIdAsync(int bomTreeId)
         {
-            const string storedProcedureName = "sp_GetBOMTreeById";
+            const string bomTreeSql = @"
+            SELECT 
+                bt.Id,
+                bt.ItemMasterSalesId,
+                ims.ID, ims.ItemName, ims.ItemCode, ims.Grade, ims.UOM, ims.Quantity, ims.Level, ims.PType, ims.CreatedDate
+            FROM 
+                dbo.BOMTrees bt
+            INNER JOIN 
+                dbo.ItemMasterSales ims ON bt.ItemMasterSalesId = ims.ID
+            WHERE 
+                bt.Id = @BOMTreeId;
+            ";
 
-            // Execute the stored procedure to get multiple result sets
-            var result = await db.QueryMultipleAsync(storedProcedureName,
-                new { Id = bomId }, commandType: CommandType.StoredProcedure);
+            const string subAssembliesSql = @"
+            SELECT 
+                sa.ID,
+                sa.ItemName,
+                sa.UOM,
+                sa.CostPerUnit,
+                sa.ItemMasterSalesId,
+                sa.Level,
+                sa.ParentSubAssemblyId,
+                sa.PType
+            FROM 
+                dbo.SubAssemblies sa
+            WHERE 
+                sa.ItemMasterSalesId = @ItemMasterSalesId;
+            ";
 
-            // 1. Read and map the BOMTree object
-            var bomTree = result.Read<BOMTree>().SingleOrDefault();
-            var itemMasterSales = result.Read<ItemMasterSale>().SingleOrDefault();
-            var nodes = result.Read<BOMTreeNode>().ToList();
-            var subAssemblies = result.Read<SubAssemblie>().ToList();
-            var rawMaterials = result.Read<ItemMasterRawMaterial>().ToList();
+            const string rawMaterialsSql = @"
+            SELECT 
+                rm.ID,
+                rm.SubAssemblyId,
+                rm.ItemName,
+                rm.ItemCode,
+                rm.Grade,
+                rm.UOM,
+                rm.Quantity,
+                rm.Level,
+                rm.PType,
+                rm.CostPerUnit
+            FROM 
+                dbo.ItemMasterRawMaterials rm
+            WHERE 
+                rm.SubAssemblyId IN (SELECT ID FROM dbo.SubAssemblies WHERE ItemMasterSalesId = @ItemMasterSalesId);
+            ";
 
-            if (bomTree != null)
+            const string bomTreeNodesSql = @"
+            SELECT 
+                btn.Id,
+                btn.Name,
+                btn.ParentId,
+                btn.Level,
+                btn.NodeType,
+                btn.PType,
+                btn.BOMId
+            FROM 
+                dbo.BOMTreeNodes btn
+            WHERE 
+                btn.BOMId = @BOMTreeId;
+            ";
+
+            // Step 1: Retrieve BOMTree and ItemMasterSales
+            var bomTreeRecord = await _dbConnection.QueryAsync<BOMTree, ItemMasterSale, BOMTree>(bomTreeSql,
+                (bomTree, itemMasterSale) =>
+                {
+                    bomTree.ItemMasterSales = itemMasterSale;
+                    return bomTree;
+                },
+                new { BOMTreeId = bomTreeId });
+
+            var bomTree = bomTreeRecord.FirstOrDefault();
+
+            if (bomTree == null)
             {
-                // Attach ItemMasterSales to the BOMTree object
-                bomTree.ItemMasterSales = itemMasterSales;
+                return null; // No BOM tree found
+            }
 
-                // 2. Create a dictionary to map nodes by their ID (to facilitate parent-child relationships)
-                var nodeDictionary = nodes.ToDictionary(n => n.Id);
+            // Step 2: Retrieve SubAssemblies
+            var subAssemblies = await _dbConnection.QueryAsync<SubAssemblie>(subAssembliesSql,
+                new { ItemMasterSalesId = bomTree.ItemMasterSalesId });
 
-                // 3. Initialize empty lists for node children and sub-assemblies
-                foreach (var node in nodes)
+            // Step 3: Retrieve RawMaterials for SubAssemblies
+            var rawMaterials = await _dbConnection.QueryAsync<ItemMasterRawMaterial>(rawMaterialsSql,
+                new { ItemMasterSalesId = bomTree.ItemMasterSalesId });
+
+            // Step 4: Retrieve BOMTreeNodes
+            var bomTreeNodes = await _dbConnection.QueryAsync<BOMTreeNode>(bomTreeNodesSql,
+                new { BOMTreeId = bomTree.Id });
+
+            // Map the nodes, subassemblies, and raw materials to form the hierarchical structure
+            var nodeDictionary = bomTreeNodes.ToDictionary(n => n.Id, n => n);
+            var subAssemblyDictionary = subAssemblies.ToDictionary(sa => sa.Id, sa => sa);
+            var rawMaterialDictionary = rawMaterials.ToDictionary(rm => rm.Id, rm => rm);
+
+            // Step 5: Build the hierarchy for SubAssemblies
+            foreach (var subAssembly in subAssemblies)
+            {
+                if (subAssembly.ParentSubAssemblyId == null)
                 {
-                    node.Children = new List<BOMTreeNode>();
-                    node.SubAssemblies = new List<SubAssemblie>();
+                    // This subassembly is a direct child of ItemMasterSales (top-level node)
+                    bomTree.SubAssemblies.Add(subAssembly);
                 }
-
-                // 4. Establish parent-child relationships among nodes
-                foreach (var node in nodes)
+                else if (subAssemblyDictionary.ContainsKey(subAssembly.ParentSubAssemblyId.Value))
                 {
-                    if (node.ParentId.HasValue && nodeDictionary.TryGetValue(node.ParentId.Value, out var parentNode))
-                    {
-                        parentNode.Children.Add(node);  // Add the node as a child of its parent
-                    }
+                    // This subassembly is a child of another subassembly
+                    var parentSubAssembly = subAssemblyDictionary[subAssembly.ParentSubAssemblyId.Value];
+                    parentSubAssembly.ChildSubAssemblies.Add(subAssembly);
                 }
+            }
 
-                // 5. Get top-level nodes (without ParentId) and assign to BOMTree
-                bomTree.Nodes = nodes.Where(n => !n.ParentId.HasValue).ToList();
-
-                // 6. Attach sub-assemblies to their respective nodes
-                foreach (var subAssembly in subAssemblies)
+            // Step 6: Map Raw Materials to corresponding SubAssemblies
+            foreach (var rawMaterial in rawMaterials)
+            {
+                if (subAssemblyDictionary.ContainsKey(rawMaterial.SubAssemblyId))
                 {
-                    // Find the parent node (based on ItemMasterSalesId) and add the sub-assembly
-                    if (nodeDictionary.TryGetValue((int)subAssembly.ParentSubAssemblyId, out var parentNode))
-                    {
-                        parentNode.SubAssemblies.Add(subAssembly);
-                    }
+                    var subAssembly = subAssemblyDictionary[rawMaterial.SubAssemblyId];
+                    subAssembly.RawMaterials.Add(rawMaterial);
                 }
+            }
 
-                // 7. Attach raw materials to their respective sub-assemblies
-                foreach (var rawMaterial in rawMaterials)
+            // Step 7: Build BOM Tree Nodes hierarchy
+            foreach (var node in bomTreeNodes)
+            {
+                if (node.ParentId == bomTree.ItemMasterSalesId)
                 {
-                    var parentSubAssembly = subAssemblies.FirstOrDefault(sa => sa.Id == rawMaterial.SubAssemblyId);
-                    if (parentSubAssembly != null)
-                    {
-                        parentSubAssembly.RawMaterials ??= new List<ItemMasterRawMaterial>();
-                        parentSubAssembly.RawMaterials.Add(rawMaterial);
-                    }
+                    // This node is a direct child of ItemMasterSales (top-level node)
+                    bomTree.Nodes.Add(node);
+                }
+                else if (nodeDictionary.ContainsKey((int)node.ParentId))
+                {
+                    // This node is a child of another node
+                    nodeDictionary[(int)node.ParentId].Children.Add(node);
                 }
             }
 
             return bomTree;
         }
+    
 
-        public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
+
+    public async Task<BOMTree> UpdateBOMTreeAsync(BOMTree bomTree)
         {
             using (var tran = BeginTransaction())
             {

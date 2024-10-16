@@ -58,7 +58,7 @@ namespace bom.Managers.Search.Implementations
                 Id = s.Id,
                 ItemName = s.ItemName,
                 UOM = s.UOM,
-                CostPerUnit = s.CostPerUnit,
+                CostPerUnit = (decimal)s.CostPerUnit,
             });
         }
 

@@ -30,6 +30,10 @@ using System.Threading.Tasks;
         public string NodeType { get; set; } 
         public string PType { get; set; }
         public List<SubAssemblie> SubAssemblies { get; internal set; }
+        public dynamic Quantity { get; internal set; }
+        public dynamic CostPerUnit { get; internal set; }
+        public string UOM { get; internal set; }
+        public List<ItemMasterRawMaterial> RawMaterials { get; internal set; }
     }
 
 
