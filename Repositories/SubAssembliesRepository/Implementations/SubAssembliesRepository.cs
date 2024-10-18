@@ -26,9 +26,9 @@ namespace bom.Repositories.SubAssemblies.Implementations
                     // Insert the SubAssemblie first
                     const string insertSubAssemblieSql = @"
                 INSERT INTO dbo.SubAssemblies 
-                    (ItemMasterSalesId, ItemName, UOM, CostPerUnit, Level, ParentSubAssemblyId, PType) 
+                    (ItemMasterSalesId, ItemName, UOM, CostPerUnit, Level, ParentSubAssemblyId, PType, Quantity) 
                 VALUES 
-                    (@ItemMasterSalesId, @ItemName, @UOM, @CostPerUnit, @Level, @ParentSubAssemblyId, @PType); 
+                    (@ItemMasterSalesId, @ItemName, @UOM, @CostPerUnit, @Level, @ParentSubAssemblyId, @PType, @Quantity); 
                 SELECT CAST(SCOPE_IDENTITY() as int)";
 
                     var id = await db.QueryAsync<int>(insertSubAssemblieSql, new
@@ -39,7 +39,8 @@ namespace bom.Repositories.SubAssemblies.Implementations
                         CostPerUnit = subAssembly.CostPerUnit,
                         Level = subAssembly.Level,
                         ParentSubAssemblyId = subAssembly.ParentSubAssemblyId,
-                        PType = subAssembly.PType
+                        PType = subAssembly.PType,
+                        Qyantity = subAssembly.Quantity
                     }, transaction: tran);
 
                     // Set the generated SubAssembly ID
@@ -99,9 +100,9 @@ namespace bom.Repositories.SubAssemblies.Implementations
             // Insert the SubAssemblie
             const string insertSubAssemblieSql = @"
         INSERT INTO dbo.SubAssemblies 
-            (ItemMasterSalesId, ItemName, UOM, CostPerUnit, Level, ParentSubAssemblyId, PType) 
+            (ItemMasterSalesId, ItemName, UOM, CostPerUnit, Level, ParentSubAssemblyId, PType, Quantity) 
         VALUES 
-            (@ItemMasterSalesId, @ItemName, @UOM, @CostPerUnit, @Level, @ParentSubAssemblyId, @PType); 
+            (@ItemMasterSalesId, @ItemName, @UOM, @CostPerUnit, @Level, @ParentSubAssemblyId, @PType, @Quantity); 
         SELECT CAST(SCOPE_IDENTITY() as int)";
 
             var id = await db.QueryAsync<int>(insertSubAssemblieSql, new
@@ -112,7 +113,8 @@ namespace bom.Repositories.SubAssemblies.Implementations
                 CostPerUnit = subAssembly.CostPerUnit,
                 Level = subAssembly.Level,
                 ParentSubAssemblyId = subAssembly.ParentSubAssemblyId,
-                PType = subAssembly.PType
+                PType = subAssembly.PType,
+                Quantity = subAssembly.Quantity 
             }, transaction: tran);
 
             // Set the generated SubAssembly ID
@@ -246,7 +248,8 @@ namespace bom.Repositories.SubAssemblies.Implementations
                 CostPerUnit = rawSubAssemblieObject?.CostPerUnit ?? 0,
                 Level = rawSubAssemblieObject?.Level ?? 0,
                 ParentSubAssemblyId = rawSubAssemblieObject?.ParentSubAssemblyId,
-                PType = rawSubAssemblieObject?.PType ?? string.Empty
+                PType = rawSubAssemblieObject?.PType ?? string.Empty,
+                Quantity = rawSubAssemblieObject?.Quantity ?? 0
             };
 
             // Fetch Raw Materials for the SubAssemblie

@@ -10,10 +10,6 @@ using bom.Managers.SubAssemblies.Abstractions;
 using bom.Managers.SubAssemblies.Implementations;
 using bom.Repositories.SubAssemblies.Abstractions;
 using bom.Repositories.SubAssemblies.Implementations;
-using bom.Managers.BoughtOutItems.Abstractions;
-using bom.Managers.BoughtOutItems.Implementations;
-using bom.Repositories.BoughtOutItems.Abstractions;
-using bom.Repositories.BoughtOutItems.Implementations;
 using bom.Managers.BOMStructures.Abstractions;
 using bom.Managers.BOMStructures.Implementations;
 using bom.Repositories.BOMStructures.Abstractions;
@@ -22,9 +18,6 @@ using bom.Managers.Search.Abstractions;
 using bom.Managers.Search.Implementations;
 using bom.Repositories.Search.Abstractions;
 using bom.Repositories.Search.Implementations;
-using bom.Managers.ItemRawMaterialMappings.Abstractions;
-using bom.Managers.ItemRawMaterialMappings.Implementations;
-using bom.Managers.BoughtOutItems;
 using bom.Managers.BOMStructures;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -42,19 +35,16 @@ namespace bom.API.AppSetup
         {
             // ItemMasterSales
             services.AddScoped<IItemMasterSalesManager, ItemMasterSalesManager>();
-            services.AddScoped<IItemRawMaterialMappingManager, ItemRawMaterialMappingManager>();
+            
 
             // ItemMasterRawMaterials
             services.AddScoped<IItemMasterRawMaterialsManager, ItemMasterRawMaterialsManager>();
-            services.AddScoped<IRawMaterialBoughtOutMappingManager, RawMaterialBoughtOutMappingManager>();
+            
 
             // SubAssemblies
             services.AddScoped<ISubAssembliesManager, SubAssembliesManager>();
-            services.AddScoped<ISubAssemblyMappingManager, SubAssemblyMappingManager>();
+            
 
-            // BoughtOutItems
-            services.AddScoped<IBoughtOutItemsManager, BoughtOutItemsManager>();
-            services.AddScoped<IBoughtOutItemMappingManager, BoughtOutItemMappingManager>();
 
             // BOMStructures
             services.AddScoped<IBOMStructuresManager, BOMStructuresManager>();
@@ -72,20 +62,16 @@ namespace bom.API.AppSetup
         {
             // ItemMasterSales
             services.AddScoped<IItemMasterSalesRepository>(x => new ItemMasterSalesRepository(connectionString));
-            services.AddScoped<IItemRawMaterialMappingRepository>(x => new ItemRawMaterialMappingRepository(connectionString)); 
+            
 
             // ItemMasterRawMaterials
             services.AddScoped<IItemMasterRawMaterialsRepository>(x => new ItemMasterRawMaterialsRepository(connectionString));
-            services.AddScoped<IRawMaterialBoughtOutMappingRepository>(x => new RawMaterialBoughtOutMappingRepository(connectionString)); 
+            
 
             // SubAssemblies
             services.AddScoped<ISubAssembliesRepository>(x => new SubAssembliesRepository(connectionString));
-            services.AddScoped<ISubAssemblyMappingRepository>(x => new SubAssemblyMappingRepository(connectionString)); 
-
-            // BoughtOutItems
-            services.AddScoped<IBoughtOutItemsRepository>(x => new BoughtOutItemsRepository(connectionString));
-            services.AddScoped<IBoughtOutItemMappingRepository>(x => new BoughtOutItemMappingRepository(connectionString)); 
-
+            
+            
             // BOMStructures
             services.AddScoped<IBOMStructuresRepository>(x => new BOMStructuresRepository(connectionString));
 

@@ -58,18 +58,6 @@ namespace bom.API.Controllers
             }
         }
 
-        [HttpGet("bought-out-items")]
-        public async Task<ActionResult> SearchBoughtOutItems([FromQuery] SearchRequest request)
-        {
-            try
-            {
-                var results = await _searchManager.SearchBoughtOutItemsAsync(request.Query);
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+       
     }
 }

@@ -6,7 +6,6 @@ using Dapper;
 using bom.Models.ItemMasterSales;
 using bom.Models.ItemMasterRawMaterials;
 using bom.Models.SubAssemblies;
-using bom.Models.BoughtOutItems;
 using bom.Repositories.Search.Abstractions;
 using System.Data.SqlClient;
 
@@ -45,12 +44,5 @@ namespace bom.Repositories.Search.Implementations
             return result;
         }
 
-        public async Task<IEnumerable<BoughtOutItem>> SearchBoughtOutItemsAsync(string query)
-        {
-            const string storedProcedureName = "sp_SearchBoughtOutItems";
-
-            var result = await db.QueryAsync<BoughtOutItem>(storedProcedureName, new { Query = query }, commandType: CommandType.StoredProcedure);
-            return result;
-        }
     }
 }

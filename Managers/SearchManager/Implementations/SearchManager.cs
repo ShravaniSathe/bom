@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using bom.Models.ItemMasterSales;
 using bom.Models.ItemMasterRawMaterials;
 using bom.Models.SubAssemblies;
-using bom.Models.BoughtOutItems;
 using bom.Models.Searches;
 using bom.Managers.Search.Abstractions;
 using bom.Repositories.Search.Abstractions;
@@ -62,19 +61,6 @@ namespace bom.Managers.Search.Implementations
             });
         }
 
-        public async Task<IEnumerable<SearchBoughtOutItemsResponse>> SearchBoughtOutItemsAsync(string query)
-        {
-            var boughtOutItems = await _searchRepository.SearchBoughtOutItemsAsync(query);
-            return boughtOutItems.Select(b => new SearchBoughtOutItemsResponse
-            {
-                Id = b.Id,
-                ItemName = b.ItemName,
-                SubAssemblyId = b.SubAssemblyId,
-                UOM = b.UOM,
-                Quantity = b.Quantity,
-                CostPerUnit = b.CostPerUnit,
-                PType = b.PType
-            });
-        }
+        
     }
 }
